@@ -312,6 +312,118 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Visual Drag-and-Drop Interface -->
+                    <div id="visual-interface" class="mt-8 hidden">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-xl font-bold mb-6 text-center">
+                                <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                                    🎯 Visual File Organizer
+                                </span>
+                            </h3>
+                            
+                            <!-- Mode Selection -->
+                            <div class="mb-6">
+                                <div class="flex justify-center space-x-4">
+                                    <button id="merge-mode" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                        📄 Merge Mode
+                                    </button>
+                                    <button id="organize-mode" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                                        🔄 Organize Mode
+                                    </button>
+                                    <button id="compare-mode" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                                        ⚖️ Compare Mode
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- File Preview Panels -->
+                            <div id="preview-panels" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                                <!-- Source Panel -->
+                                <div class="border-2 border-dashed border-blue-300 rounded-lg p-4 bg-blue-50">
+                                    <h4 class="font-semibold text-blue-800 mb-3 text-center">📁 Source Files</h4>
+                                    <div id="source-files" class="space-y-2 min-h-[200px]">
+                                        <div class="text-center text-gray-500 py-8">
+                                            <i class="fas fa-file-upload text-4xl mb-2"></i>
+                                            <p>Drop files here or select files above</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Target Panel -->
+                                <div class="border-2 border-dashed border-green-300 rounded-lg p-4 bg-green-50">
+                                    <h4 class="font-semibold text-green-800 mb-3 text-center">🎯 Target Area</h4>
+                                    <div id="target-area" class="space-y-2 min-h-[200px] drop-zone">
+                                        <div class="text-center text-gray-500 py-8">
+                                            <i class="fas fa-bullseye text-4xl mb-2"></i>
+                                            <p>Drag elements here to organize</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Comparison View (for compare mode) -->
+                            <div id="comparison-view" class="hidden">
+                                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                                    <h4 class="font-semibold text-gray-800 mb-4 text-center">📊 Side-by-Side Comparison</h4>
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                        <!-- File 1 Preview -->
+                                        <div class="bg-white rounded-lg border p-4">
+                                            <div class="flex items-center justify-between mb-3">
+                                                <h5 class="font-medium text-gray-700">📄 File 1</h5>
+                                                <span id="file1-status" class="text-sm px-2 py-1 rounded bg-blue-100 text-blue-800">Original</span>
+                                            </div>
+                                            <div id="file1-preview" class="border rounded bg-gray-50 h-64 overflow-y-auto text-xs p-2">
+                                                <!-- File 1 content preview -->
+                                            </div>
+                                        </div>
+
+                                        <!-- File 2 Preview -->
+                                        <div class="bg-white rounded-lg border p-4">
+                                            <div class="flex items-center justify-between mb-3">
+                                                <h5 class="font-medium text-gray-700">📄 File 2</h5>
+                                                <span id="file2-status" class="text-sm px-2 py-1 rounded bg-green-100 text-green-800">Target</span>
+                                            </div>
+                                            <div id="file2-preview" class="border rounded bg-gray-50 h-64 overflow-y-auto text-xs p-2">
+                                                <!-- File 2 content preview -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Differences Panel -->
+                                    <div class="mt-4 bg-white rounded-lg border p-4">
+                                        <h5 class="font-medium text-gray-700 mb-3">🔍 Detected Differences</h5>
+                                        <div id="differences-list" class="space-y-2 max-h-32 overflow-y-auto">
+                                            <!-- Differences will be populated here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex justify-center space-x-4">
+                                <button id="preview-result" class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50">
+                                    👁️ Preview Result
+                                </button>
+                                <button id="apply-changes" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50">
+                                    ✅ Apply Changes
+                                </button>
+                                <button id="reset-visual" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                                    🔄 Reset
+                                </button>
+                            </div>
+
+                            <!-- Real-time Preview -->
+                            <div id="live-preview" class="mt-6 hidden">
+                                <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 border">
+                                    <h4 class="font-semibold text-gray-800 mb-3 text-center">⚡ Live Preview</h4>
+                                    <div id="preview-content" class="bg-white rounded border p-4 h-40 overflow-y-auto text-sm">
+                                        <!-- Live preview content -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>

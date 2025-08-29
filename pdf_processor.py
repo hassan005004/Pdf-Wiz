@@ -515,98 +515,196 @@ class PDFProcessor:
             raise Exception(f"Word to PDF conversion failed: {str(e)}")
     
     def excel_to_pdf(self, input_path: str, output_path: str):
-        """Convert Excel file to PDF with proper formatting and pagination"""
+        """Convert Excel file to PDF with enhanced formatting, text wrapping, and cell preservation"""
         try:
             from reportlab.lib.pagesizes import letter, A4, landscape
-            from reportlab.lib.units import inch
+            from reportlab.lib.units import inch, cm
+            from reportlab.platypus import Paragraph
+            from reportlab.lib.styles import ParagraphStyle
+            import datetime
             
-            workbook = load_workbook(input_path)
+            workbook = load_workbook(input_path, data_only=False)
             
             # Create PDF with landscape orientation for better fit
             pdf_doc = SimpleDocTemplate(
                 output_path,
                 pagesize=landscape(A4),
-                rightMargin=0.5*inch,
-                leftMargin=0.5*inch,
-                topMargin=0.5*inch,
-                bottomMargin=0.5*inch
+                rightMargin=0.4*inch,
+                leftMargin=0.4*inch,
+                topMargin=0.4*inch,
+                bottomMargin=0.4*inch
             )
             elements = []
             styles = getSampleStyleSheet()
             
+            # Custom style for cell content with better wrapping
+            cell_style = ParagraphStyle(
+                'CellStyle',
+                parent=styles['Normal'],
+                fontSize=8,
+                leading=10,
+                wordWrap='LTR',
+                alignment=0,  # Left alignment
+                spaceAfter=0,
+                spaceBefore=0,
+                leftIndent=2,
+                rightIndent=2
+            )
+            
             for sheet_name in workbook.sheetnames:
                 sheet = workbook[sheet_name]
                 
-                # Add sheet title
-                elements.append(Paragraph(f"Sheet: {sheet_name}", styles['Heading1']))
+                # Add sheet title with emoji
+                sheet_title = Paragraph(f"📊 Sheet: {sheet_name}", styles['Heading1'])
+                elements.append(sheet_title)
                 elements.append(Spacer(1, 12))
                 
-                # Get actual data range (not empty cells)
+                # Get actual data range and cell formatting
                 data = []
+                formatted_data = []
                 max_cols = 0
+                col_max_widths = {}
                 
-                for row in sheet.iter_rows(values_only=True):
-                    # Convert row to list and handle None values
+                # First pass: collect all data and analyze column widths
+                for row_idx, row in enumerate(sheet.iter_rows(values_only=False)):
                     row_data = []
-                    for cell in row:
-                        if cell is None:
-                            row_data.append('')
+                    formatted_row = []
+                    
+                    for col_idx, cell in enumerate(row):
+                        cell_value = cell.value if cell.value is not None else ''
+                        
+                        # Handle different data types with proper formatting
+                        if isinstance(cell_value, datetime.datetime):
+                            cell_str = cell_value.strftime('%Y-%m-%d %H:%M')
+                        elif isinstance(cell_value, datetime.date):
+                            cell_str = cell_value.strftime('%Y-%m-%d')
+                        elif isinstance(cell_value, (int, float)):
+                            # Format numbers with proper precision
+                            if isinstance(cell_value, float) and cell_value.is_integer():
+                                cell_str = str(int(cell_value))
+                            else:
+                                cell_str = f"{cell_value:.2f}" if isinstance(cell_value, float) else str(cell_value)
                         else:
-                            # Format numbers and dates properly
-                            cell_str = str(cell)
-                            if len(cell_str) > 50:  # Truncate very long text
-                                cell_str = cell_str[:47] + '...'
-                            row_data.append(cell_str)
+                            cell_str = str(cell_value)
+                        
+                        # Intelligent text wrapping for long content
+                        if len(cell_str) > 30:
+                            # Break long text at word boundaries
+                            words = cell_str.split()
+                            if len(words) > 1:
+                                wrapped_text = ''
+                                current_line = ''
+                                for word in words:
+                                    if len(current_line + ' ' + word) <= 30:
+                                        current_line += (' ' + word if current_line else word)
+                                    else:
+                                        wrapped_text += (current_line + '<br/>')
+                                        current_line = word
+                                if current_line:
+                                    wrapped_text += current_line
+                                cell_str = wrapped_text
+                            else:
+                                # Single long word - break it
+                                cell_str = cell_str[:27] + '...'
+                        
+                        row_data.append(cell_str)
+                        
+                        # Create paragraph for better text rendering
+                        para = Paragraph(cell_str, cell_style)
+                        formatted_row.append(para)
+                        
+                        # Track maximum content width for each column
+                        content_width = len(str(cell_str).replace('<br/>', ''))
+                        if col_idx not in col_max_widths:
+                            col_max_widths[col_idx] = content_width
+                        else:
+                            col_max_widths[col_idx] = max(col_max_widths[col_idx], content_width)
                     
                     # Only add non-empty rows
-                    if any(cell.strip() for cell in row_data if cell):
+                    if any(str(cell).strip() for cell in row_data if cell):
                         data.append(row_data)
+                        formatted_data.append(formatted_row)
                         max_cols = max(max_cols, len(row_data))
                 
-                if data:
+                if formatted_data:
                     # Ensure all rows have the same number of columns
-                    for row in data:
+                    for i, row in enumerate(formatted_data):
                         while len(row) < max_cols:
-                            row.append('')
+                            row.append(Paragraph('', cell_style))
+                            data[i].append('')
                     
-                    # Calculate optimal column widths
-                    available_width = landscape(A4)[0] - 1*inch  # Page width minus margins
+                    # Calculate intelligent column widths based on content
+                    available_width = landscape(A4)[0] - 0.8*inch  # Page width minus margins
+                    
                     if max_cols > 0:
-                        col_width = available_width / max_cols
-                        # Ensure minimum column width
-                        col_width = max(col_width, 0.5*inch)
-                        col_widths = [col_width] * max_cols
+                        # Calculate proportional widths based on content
+                        total_content_width = sum(col_max_widths.get(i, 10) for i in range(max_cols))
+                        col_widths = []
+                        
+                        for i in range(max_cols):
+                            content_width = col_max_widths.get(i, 10)
+                            # Proportional width with minimum and maximum constraints
+                            prop_width = (content_width / total_content_width) * available_width
+                            # Ensure reasonable column width constraints
+                            col_width = max(min(prop_width, 3*inch), 0.8*inch)
+                            col_widths.append(col_width)
+                        
+                        # Adjust if total width exceeds available space
+                        total_width = sum(col_widths)
+                        if total_width > available_width:
+                            scale_factor = available_width / total_width
+                            col_widths = [w * scale_factor for w in col_widths]
                     else:
                         col_widths = None
                     
                     # Split large tables across multiple pages
-                    chunk_size = 25  # Rows per page
-                    for i in range(0, len(data), chunk_size):
-                        chunk_data = data[i:i+chunk_size]
+                    chunk_size = 20  # Reduced for better page layout
+                    for i in range(0, len(formatted_data), chunk_size):
+                        chunk_data = formatted_data[i:i+chunk_size]
                         
-                        table = Table(chunk_data, colWidths=col_widths)
-                        table.setStyle(TableStyle([
-                            # Header styling (if first chunk and first row looks like header)
-                            ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
-                            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-                            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                        table = Table(chunk_data, colWidths=col_widths, repeatRows=1)
+                        
+                        # Enhanced table styling with better formatting preservation
+                        table_style = [
+                            # Header styling (first row)
+                            ('BACKGROUND', (0, 0), (-1, 0), colors.navy),
+                            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
                             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                            ('FONTSIZE', (0, 0), (-1, 0), 10),
-                            ('FONTSIZE', (0, 1), (-1, -1), 8),
-                            ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
-                            ('TOPPADDING', (0, 0), (-1, 0), 6),
+                            ('FONTSIZE', (0, 0), (-1, 0), 9),
+                            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+                            ('TOPPADDING', (0, 0), (-1, 0), 8),
+                            ('LEFTPADDING', (0, 0), (-1, -1), 4),
+                            ('RIGHTPADDING', (0, 0), (-1, -1), 4),
+                            
+                            # Data rows styling
                             ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-                            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+                            ('FONTSIZE', (0, 1), (-1, -1), 8),
+                            ('BOTTOMPADDING', (0, 1), (-1, -1), 4),
+                            ('TOPPADDING', (0, 1), (-1, -1), 4),
+                            
+                            # Grid and borders - enhanced for clarity
+                            ('GRID', (0, 0), (-1, -1), 0.8, colors.black),
+                            ('LINEBELOW', (0, 0), (-1, 0), 2, colors.navy),
+                            ('LINEABOVE', (0, 0), (-1, 0), 1, colors.black),
+                            
+                            # Alignment and vertical alignment
+                            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
                             ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                            
                             # Alternating row colors for better readability
-                            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey])
-                        ]))
+                            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
+                            
+                            # Enhanced spacing for wrapped content
+                            ('LEADING', (0, 0), (-1, -1), 12),
+                        ]
+                        
+                        table.setStyle(TableStyle(table_style))
                         
                         elements.append(table)
-                        elements.append(Spacer(1, 12))
+                        elements.append(Spacer(1, 15))
                         
                         # Add page break between chunks (except last)
-                        if i + chunk_size < len(data):
+                        if i + chunk_size < len(formatted_data):
                             elements.append(PageBreak())
                 
                 # Add page break between sheets (except last)
@@ -616,7 +714,7 @@ class PDFProcessor:
             pdf_doc.build(elements)
             
         except Exception as e:
-            raise Exception(f"Excel to PDF conversion failed: {str(e)}")
+            raise Exception(f"Enhanced Excel to PDF conversion failed: {str(e)}")
     
     def powerpoint_to_pdf(self, input_path: str, output_path: str):
         """Convert PowerPoint to PDF"""
