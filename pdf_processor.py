@@ -363,50 +363,128 @@ class PDFProcessor:
             images[0].save(output_path, save_all=True, append_images=images[1:], resolution=300.0)
     
     def pdf_to_images(self, input_path: str, format: str = 'JPEG') -> List[str]:
-        """Convert PDF pages to images using alternative method"""
+        """Convert PDF pages to images with proper rendering"""
         output_files = []
         
         try:
-            # First try pdf2image with poppler
+            # First try pdf2image with poppler - this should work now
             try:
-                images = convert_from_path(input_path, dpi=300)
+                from pdf2image import convert_from_path
+                # Try with higher DPI and better settings
+                images = convert_from_path(
+                    input_path, 
+                    dpi=300,
+                    output_folder='outputs',
+                    fmt=format.lower(),
+                    thread_count=1,
+                    poppler_path=None  # Use system poppler
+                )
                 
                 for i, image in enumerate(images):
                     base_name = os.path.splitext(os.path.basename(input_path))[0]
                     output_path = f"outputs/{base_name}_page_{i+1}.{format.lower()}"
-                    image.save(output_path, format)
+                    # Save with high quality
+                    if format.upper() == 'JPEG':
+                        image.save(output_path, format, quality=95, optimize=True)
+                    else:
+                        image.save(output_path, format, optimize=True)
                     output_files.append(output_path)
                     
                 return output_files
-            except Exception:
-                # Fallback: Use PyPDF2 with PIL for basic conversion
-                from reportlab.pdfgen import canvas
-                import tempfile
                 
-                with open(input_path, 'rb') as file:
-                    reader = PyPDF2.PdfReader(file)
+            except ImportError:
+                # Install pdf2image if not available
+                raise Exception("pdf2image library is required but not properly installed")
+            except Exception as pdf2image_error:
+                # Advanced fallback: Use fitz (PyMuPDF) for better PDF rendering
+                try:
+                    import fitz  # PyMuPDF
+                    doc = fitz.open(input_path)
                     
-                    for page_num, page in enumerate(reader.pages):
-                        # Create a temporary PDF with single page
-                        temp_pdf_path = f"{tempfile.gettempdir()}/temp_page_{page_num}.pdf"
-                        writer = PyPDF2.PdfWriter()
-                        writer.add_page(page)
+                    for page_num in range(len(doc)):
+                        page = doc.load_page(page_num)
+                        # Render page as image with high resolution
+                        mat = fitz.Matrix(3.0, 3.0)  # 3x zoom for better quality
+                        pix = page.get_pixmap(matrix=mat)
                         
-                        with open(temp_pdf_path, 'wb') as temp_file:
-                            writer.write(temp_file)
-                        
-                        # Convert to image using reportlab rendering
                         base_name = os.path.splitext(os.path.basename(input_path))[0]
                         output_path = f"outputs/{base_name}_page_{page_num+1}.{format.lower()}"
                         
-                        # Create a simple image placeholder
-                        img = Image.new('RGB', (612, 792), 'white')
-                        img.save(output_path, format)
-                        output_files.append(output_path)
+                        if format.upper() == 'JPEG':
+                            pix.save(output_path, output="jpeg")
+                        else:
+                            pix.save(output_path, output="png")
                         
-                        # Clean up temp file
-                        if os.path.exists(temp_pdf_path):
-                            os.unlink(temp_pdf_path)
+                        output_files.append(output_path)
+                    
+                    doc.close()
+                    return output_files
+                    
+                except ImportError:
+                    # Final fallback: Use Pillow with better PDF support
+                    try:
+                        # Try using Pillow's PDF support
+                        with Image.open(input_path) as img:
+                            for i in range(img.n_frames):
+                                img.seek(i)
+                                base_name = os.path.splitext(os.path.basename(input_path))[0]
+                                output_path = f"outputs/{base_name}_page_{i+1}.{format.lower()}"
+                                
+                                # Convert and save with better quality
+                                if img.mode != 'RGB':
+                                    img = img.convert('RGB')
+                                
+                                if format.upper() == 'JPEG':
+                                    img.save(output_path, format, quality=95)
+                                else:
+                                    img.save(output_path, format)
+                                
+                                output_files.append(output_path)
+                        
+                        return output_files
+                    except Exception:
+                        # Last resort: Create a text-based representation
+                        with open(input_path, 'rb') as file:
+                            reader = PyPDF2.PdfReader(file)
+                            
+                            for page_num, page in enumerate(reader.pages):
+                                base_name = os.path.splitext(os.path.basename(input_path))[0]
+                                output_path = f"outputs/{base_name}_page_{page_num+1}.{format.lower()}"
+                                
+                                # Extract text and create image with text
+                                try:
+                                    text = page.extract_text()
+                                    # Create image with text content
+                                    img = Image.new('RGB', (1200, 1600), 'white')
+                                    # This creates a basic text representation
+                                    from PIL import ImageDraw, ImageFont
+                                    draw = ImageDraw.Draw(img)
+                                    
+                                    try:
+                                        font = ImageFont.load_default()
+                                    except:
+                                        font = None
+                                    
+                                    # Split text into lines and draw
+                                    lines = text.split('\n')[:50]  # Limit lines
+                                    y = 50
+                                    for line in lines:
+                                        if line.strip():
+                                            draw.text((50, y), line[:80], fill='black', font=font)
+                                            y += 30
+                                        if y > 1500:
+                                            break
+                                    
+                                    img.save(output_path, format)
+                                    output_files.append(output_path)
+                                except Exception:
+                                    # Final fallback message
+                                    img = Image.new('RGB', (800, 600), 'white')
+                                    draw = ImageDraw.Draw(img)
+                                    draw.text((50, 250), f"Page {page_num+1}", fill='black')
+                                    draw.text((50, 300), "Content could not be rendered", fill='red')
+                                    img.save(output_path, format)
+                                    output_files.append(output_path)
                 
                 return output_files
                 
@@ -437,35 +515,103 @@ class PDFProcessor:
             raise Exception(f"Word to PDF conversion failed: {str(e)}")
     
     def excel_to_pdf(self, input_path: str, output_path: str):
-        """Convert Excel file to PDF"""
+        """Convert Excel file to PDF with proper formatting and pagination"""
         try:
+            from reportlab.lib.pagesizes import letter, A4, landscape
+            from reportlab.lib.units import inch
+            
             workbook = load_workbook(input_path)
             
-            # Create PDF using reportlab
-            pdf_doc = SimpleDocTemplate(output_path)
+            # Create PDF with landscape orientation for better fit
+            pdf_doc = SimpleDocTemplate(
+                output_path,
+                pagesize=landscape(A4),
+                rightMargin=0.5*inch,
+                leftMargin=0.5*inch,
+                topMargin=0.5*inch,
+                bottomMargin=0.5*inch
+            )
             elements = []
+            styles = getSampleStyleSheet()
             
             for sheet_name in workbook.sheetnames:
                 sheet = workbook[sheet_name]
                 
-                # Convert sheet to table data
+                # Add sheet title
+                elements.append(Paragraph(f"Sheet: {sheet_name}", styles['Heading1']))
+                elements.append(Spacer(1, 12))
+                
+                # Get actual data range (not empty cells)
                 data = []
+                max_cols = 0
+                
                 for row in sheet.iter_rows(values_only=True):
-                    data.append([str(cell) if cell is not None else '' for cell in row])
+                    # Convert row to list and handle None values
+                    row_data = []
+                    for cell in row:
+                        if cell is None:
+                            row_data.append('')
+                        else:
+                            # Format numbers and dates properly
+                            cell_str = str(cell)
+                            if len(cell_str) > 50:  # Truncate very long text
+                                cell_str = cell_str[:47] + '...'
+                            row_data.append(cell_str)
+                    
+                    # Only add non-empty rows
+                    if any(cell.strip() for cell in row_data if cell):
+                        data.append(row_data)
+                        max_cols = max(max_cols, len(row_data))
                 
                 if data:
-                    table = Table(data)
-                    table.setStyle(TableStyle([
-                        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-                        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                        ('FONTSIZE', (0, 0), (-1, 0), 14),
-                        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                        ('GRID', (0, 0), (-1, -1), 1, colors.black)
-                    ]))
-                    elements.append(table)
+                    # Ensure all rows have the same number of columns
+                    for row in data:
+                        while len(row) < max_cols:
+                            row.append('')
+                    
+                    # Calculate optimal column widths
+                    available_width = landscape(A4)[0] - 1*inch  # Page width minus margins
+                    if max_cols > 0:
+                        col_width = available_width / max_cols
+                        # Ensure minimum column width
+                        col_width = max(col_width, 0.5*inch)
+                        col_widths = [col_width] * max_cols
+                    else:
+                        col_widths = None
+                    
+                    # Split large tables across multiple pages
+                    chunk_size = 25  # Rows per page
+                    for i in range(0, len(data), chunk_size):
+                        chunk_data = data[i:i+chunk_size]
+                        
+                        table = Table(chunk_data, colWidths=col_widths)
+                        table.setStyle(TableStyle([
+                            # Header styling (if first chunk and first row looks like header)
+                            ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
+                            ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                            ('FONTSIZE', (0, 0), (-1, 0), 10),
+                            ('FONTSIZE', (0, 1), (-1, -1), 8),
+                            ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
+                            ('TOPPADDING', (0, 0), (-1, 0), 6),
+                            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+                            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                            # Alternating row colors for better readability
+                            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey])
+                        ]))
+                        
+                        elements.append(table)
+                        elements.append(Spacer(1, 12))
+                        
+                        # Add page break between chunks (except last)
+                        if i + chunk_size < len(data):
+                            elements.append(PageBreak())
+                
+                # Add page break between sheets (except last)
+                if sheet_name != workbook.sheetnames[-1]:
+                    elements.append(PageBreak())
             
             pdf_doc.build(elements)
             
@@ -545,37 +691,242 @@ class PDFProcessor:
             raise Exception(f"PDF redaction failed: {str(e)}")
     
     def compare_pdfs(self, pdf1_path: str, pdf2_path: str, output_path: str):
-        """Compare two PDFs and highlight differences"""
+        """Create detailed side-by-side PDF comparison with color coding"""
         try:
+            from reportlab.lib.pagesizes import letter, landscape
+            from reportlab.lib import colors
+            from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from reportlab.lib.units import inch
+            import difflib
+            
             # Extract text from both PDFs
             with pdfplumber.open(pdf1_path) as pdf1, pdfplumber.open(pdf2_path) as pdf2:
                 text1_pages = [page.extract_text() or '' for page in pdf1.pages]
                 text2_pages = [page.extract_text() or '' for page in pdf2.pages]
             
-            # Create comparison report
-            doc = SimpleDocTemplate(output_path)
+            # Create comparison PDF with landscape layout for side-by-side view
+            doc = SimpleDocTemplate(
+                output_path,
+                pagesize=landscape(letter),
+                rightMargin=0.5*inch,
+                leftMargin=0.5*inch,
+                topMargin=0.5*inch,
+                bottomMargin=0.5*inch
+            )
+            
+            elements = []
             styles = getSampleStyleSheet()
-            story = []
             
-            story.append(Paragraph("PDF Comparison Report", styles['Title']))
-            story.append(Spacer(1, 20))
+            # Custom styles for comparison
+            same_style = ParagraphStyle(
+                'Same',
+                parent=styles['Normal'],
+                backColor=colors.lightgreen,
+                fontSize=8,
+                leading=10,
+                spaceAfter=2
+            )
             
+            different_style = ParagraphStyle(
+                'Different',
+                parent=styles['Normal'],
+                backColor=colors.lightcoral,
+                fontSize=8,
+                leading=10,
+                spaceAfter=2
+            )
+            
+            neutral_style = ParagraphStyle(
+                'Neutral',
+                parent=styles['Normal'],
+                fontSize=8,
+                leading=10,
+                spaceAfter=2
+            )
+            
+            # Title
+            title = Paragraph("📊 PDF Comparison Report - Side by Side Analysis", styles['Title'])
+            elements.append(title)
+            elements.append(Spacer(1, 20))
+            
+            # File information
+            file_info = [
+                ['📄 File 1:', os.path.basename(pdf1_path), f'📋 {len(text1_pages)} pages'],
+                ['📄 File 2:', os.path.basename(pdf2_path), f'📋 {len(text2_pages)} pages']
+            ]
+            
+            info_table = Table(file_info, colWidths=[1.5*inch, 4*inch, 1.5*inch])
+            info_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, -1), colors.lightblue),
+                ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
+            ]))
+            
+            elements.append(info_table)
+            elements.append(Spacer(1, 20))
+            
+            # Legend
+            legend = [
+                ['🏷️ Legend:', '', ''],
+                ['✅ Same content', '🟢 Green background', 'Content is identical'],
+                ['❌ Different content', '🔴 Red background', 'Content differs'],
+                ['⚠️ Missing content', '⚪ No background', 'Content exists in one file only']
+            ]
+            
+            legend_table = Table(legend, colWidths=[2*inch, 2.5*inch, 2.5*inch])
+            legend_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('BACKGROUND', (0, 1), (-1, 1), colors.lightgreen),
+                ('BACKGROUND', (0, 2), (-1, 2), colors.lightcoral),
+                ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 9),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
+            ]))
+            
+            elements.append(legend_table)
+            elements.append(Spacer(1, 30))
+            
+            # Page by page comparison
             max_pages = max(len(text1_pages), len(text2_pages))
+            differences_count = 0
+            identical_count = 0
             
             for i in range(max_pages):
-                story.append(Paragraph(f"Page {i+1} Comparison", styles['Heading2']))
+                # Page header with icons
+                page_title = Paragraph(f"📃 Page {i+1} Comparison", styles['Heading2'])
+                elements.append(page_title)
+                elements.append(Spacer(1, 10))
                 
-                text1 = text1_pages[i] if i < len(text1_pages) else "[Page not found]"
-                text2 = text2_pages[i] if i < len(text2_pages) else "[Page not found]"
+                # Get text from both pages
+                text1 = text1_pages[i] if i < len(text1_pages) else ""
+                text2 = text2_pages[i] if i < len(text2_pages) else ""
                 
-                if text1 != text2:
-                    story.append(Paragraph("Differences found on this page.", styles['Normal']))
+                # Prepare display texts
+                if i >= len(text1_pages):
+                    display_text1 = "📋 [Page does not exist in File 1]"
+                    text1_exists = False
+                elif not text1.strip():
+                    display_text1 = "📄 [Empty page]"
+                    text1_exists = True
                 else:
-                    story.append(Paragraph("No differences found on this page.", styles['Normal']))
+                    display_text1 = text1[:400] + ('...' if len(text1) > 400 else '')
+                    text1_exists = True
                 
-                story.append(Spacer(1, 20))
+                if i >= len(text2_pages):
+                    display_text2 = "📋 [Page does not exist in File 2]"
+                    text2_exists = False
+                elif not text2.strip():
+                    display_text2 = "📄 [Empty page]"
+                    text2_exists = True
+                else:
+                    display_text2 = text2[:400] + ('...' if len(text2) > 400 else '')
+                    text2_exists = True
+                
+                # Determine comparison status and styling
+                if not text1_exists or not text2_exists:
+                    status = "⚠️ MISSING PAGE"
+                    status_style = neutral_style
+                    style1 = neutral_style if not text1_exists else different_style
+                    style2 = neutral_style if not text2_exists else different_style
+                elif text1.strip() == text2.strip():
+                    status = "✅ IDENTICAL"
+                    status_style = same_style
+                    style1 = same_style
+                    style2 = same_style
+                    identical_count += 1
+                else:
+                    status = "❌ DIFFERENT"
+                    status_style = different_style
+                    style1 = different_style
+                    style2 = different_style
+                    differences_count += 1
+                    
+                    # Add detailed diff analysis for different content
+                    if text1_exists and text2_exists and text1.strip() and text2.strip():
+                        # Calculate similarity percentage
+                        similarity = difflib.SequenceMatcher(None, text1, text2).ratio()
+                        similarity_percent = round(similarity * 100, 1)
+                        status += f" ({similarity_percent}% similar)"
+                
+                # Create comparison table
+                comparison_data = [
+                    ['📄 File 1 Content', '📄 File 2 Content', '📊 Status'],
+                    [Paragraph(display_text1, style1),
+                     Paragraph(display_text2, style2),
+                     Paragraph(status, status_style)]
+                ]
+                
+                # Calculate column widths
+                page_width = landscape(letter)[0] - 1*inch
+                col_widths = [page_width*0.4, page_width*0.4, page_width*0.2]
+                
+                comparison_table = Table(comparison_data, colWidths=col_widths)
+                comparison_table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0, 0), (-1, 0), 10),
+                    ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                    ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                    ('LEFTPADDING', (0, 0), (-1, -1), 6),
+                    ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+                    ('TOPPADDING', (0, 0), (-1, -1), 6),
+                    ('BOTTOMPADDING', (0, 0), (-1, -1), 6)
+                ]))
+                
+                elements.append(comparison_table)
+                elements.append(Spacer(1, 20))
+                
+                # Add page break for better organization (except last page)
+                if i < max_pages - 1:
+                    elements.append(PageBreak())
             
-            doc.build(story)
+            # Summary section
+            elements.append(PageBreak())
+            summary_title = Paragraph("📈 Comparison Summary", styles['Heading1'])
+            elements.append(summary_title)
+            elements.append(Spacer(1, 20))
+            
+            total_pages = max_pages
+            summary_data = [
+                ['📊 Metric', '📈 Count', '📋 Details'],
+                ['📄 Total Pages Compared', str(total_pages), f'File 1: {len(text1_pages)}, File 2: {len(text2_pages)}'],
+                ['✅ Identical Pages', str(identical_count), f'{round(identical_count/total_pages*100, 1)}% of total' if total_pages > 0 else '0%'],
+                ['❌ Different Pages', str(differences_count), f'{round(differences_count/total_pages*100, 1)}% of total' if total_pages > 0 else '0%'],
+                ['⚠️ Missing Pages', str(total_pages - identical_count - differences_count), 'Pages that exist in only one file']
+            ]
+            
+            summary_table = Table(summary_data, colWidths=[2.5*inch, 1.5*inch, 3*inch])
+            summary_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.lightgrey),
+                ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('LEFTPADDING', (0, 0), (-1, -1), 8),
+                ('RIGHTPADDING', (0, 0), (-1, -1), 8),
+                ('TOPPADDING', (0, 0), (-1, -1), 8),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 8)
+            ]))
+            
+            elements.append(summary_table)
+            
+            # Build the PDF
+            doc.build(elements)
             
         except Exception as e:
             raise Exception(f"PDF comparison failed: {str(e)}")
