@@ -1,0 +1,293 @@
+%PDF-1.3
+%‚„œ”
+1 0 obj
+<<
+/Type /Pages
+/Count 3
+/Kids [ 4 0 R 9 0 R 11 0 R ]
+>>
+endobj
+2 0 obj
+<<
+/Producer (PyPDF2)
+>>
+endobj
+3 0 obj
+<<
+/Type /Catalog
+/Pages 1 0 R
+>>
+endobj
+4 0 obj
+<<
+/Contents 5 0 R
+/MediaBox [ 0 0 612 792 ]
+/Resources <<
+/Font <<
+/F1 6 0 R
+/F1750cc9f2-c0c9-42bb-8072-8d348c21df5e <<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+/F2 8 0 R
+>>
+/ProcSet [ /ImageB /Text /ImageI /PDF /ImageC ]
+>>
+/Rotate 0
+/Trans <<
+>>
+/Type /Page
+/Annots [ ]
+/Parent 1 0 R
+>>
+endobj
+5 0 obj
+<<
+/Length 435
+>>
+stream
+q
+1 0 0 1 0 0 cm
+BT
+/F1 12 Tf
+14.4 TL
+ET
+BT
+1 0 0 1 100 750 Tm
+(Page\0401\040\055\040This\040is\040a\040test\040PDF) Tj
+T*
+ET
+BT
+1 0 0 1 100 700 Tm
+(We\040will\040test\040various\040PDF\040operations) Tj
+T*
+ET
+Q
+q
+0 0 612 792 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F1750cc9f2-c0c9-42bb-8072-8d348c21df5e 12 Tf
+14.4 TL
+ET
+1 0 0 rg
+BT
+/F2 50 Tf
+60 TL
+ET
+q
+0.707107 0.707107 -0.707107 0.707107 0 0 cm
+BT
+1 0 0 1 100 100 Tm
+(CONFIDENTIAL) Tj
+T*
+ET
+Q
+Q
+
+endstream
+endobj
+6 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+7 0 obj
+<<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+8 0 obj
+<<
+/BaseFont /Helvetica-Bold
+/Encoding /WinAnsiEncoding
+/Name /F2
+/Subtype /Type1
+/Type /Font
+>>
+endobj
+9 0 obj
+<<
+/Contents 10 0 R
+/MediaBox [ 0 0 612 792 ]
+/Resources <<
+/Font <<
+/F1 6 0 R
+/F10e510f04-3c4f-4f14-a34d-cc8d193961c0 <<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+/F2 8 0 R
+>>
+/ProcSet [ /ImageB /Text /ImageI /PDF /ImageC ]
+>>
+/Rotate 0
+/Trans <<
+>>
+/Type /Page
+/Annots [ ]
+/Parent 1 0 R
+>>
+endobj
+10 0 obj
+<<
+/Length 413
+>>
+stream
+q
+1 0 0 1 0 0 cm
+BT
+/F1 12 Tf
+14.4 TL
+ET
+BT
+1 0 0 1 100 750 Tm
+(Page\0402\040\055\040Second\040page\040content) Tj
+T*
+ET
+BT
+1 0 0 1 100 700 Tm
+(More\040content\040for\040testing) Tj
+T*
+ET
+Q
+q
+0 0 612 792 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F10e510f04-3c4f-4f14-a34d-cc8d193961c0 12 Tf
+14.4 TL
+ET
+1 0 0 rg
+BT
+/F2 50 Tf
+60 TL
+ET
+q
+0.707107 0.707107 -0.707107 0.707107 0 0 cm
+BT
+1 0 0 1 100 100 Tm
+(CONFIDENTIAL) Tj
+T*
+ET
+Q
+Q
+
+endstream
+endobj
+11 0 obj
+<<
+/Contents 12 0 R
+/MediaBox [ 0 0 612 792 ]
+/Resources <<
+/Font <<
+/F1 6 0 R
+/F150c3c8a5-cee5-489f-a2d4-c737ef673323 <<
+/BaseFont /Helvetica
+/Encoding /WinAnsiEncoding
+/Name /F1
+/Subtype /Type1
+/Type /Font
+>>
+/F2 8 0 R
+>>
+/ProcSet [ /ImageB /Text /ImageI /PDF /ImageC ]
+>>
+/Rotate 0
+/Trans <<
+>>
+/Type /Page
+/Annots [ ]
+/Parent 1 0 R
+>>
+endobj
+12 0 obj
+<<
+/Length 410
+>>
+stream
+q
+1 0 0 1 0 0 cm
+BT
+/F1 12 Tf
+14.4 TL
+ET
+BT
+1 0 0 1 100 750 Tm
+(Page\0403\040\055\040Third\040page\040content) Tj
+T*
+ET
+BT
+1 0 0 1 100 700 Tm
+(Final\040page\040for\040testing) Tj
+T*
+ET
+Q
+q
+0 0 612 792 re
+W
+n
+1 0 0 1 0 0 cm
+BT
+/F150c3c8a5-cee5-489f-a2d4-c737ef673323 12 Tf
+14.4 TL
+ET
+1 0 0 rg
+BT
+/F2 50 Tf
+60 TL
+ET
+q
+0.707107 0.707107 -0.707107 0.707107 0 0 cm
+BT
+1 0 0 1 100 100 Tm
+(CONFIDENTIAL) Tj
+T*
+ET
+Q
+Q
+
+endstream
+endobj
+xref
+0 13
+0000000000 65535 f 
+0000000015 00000 n 
+0000000087 00000 n 
+0000000127 00000 n 
+0000000176 00000 n 
+0000000529 00000 n 
+0000001015 00000 n 
+0000001122 00000 n 
+0000001229 00000 n 
+0000001341 00000 n 
+0000001695 00000 n 
+0000002160 00000 n 
+0000002515 00000 n 
+trailer
+<<
+/Size 13
+/Root 3 0 R
+/Info 2 0 R
+>>
+startxref
+2977
+%%EOF
