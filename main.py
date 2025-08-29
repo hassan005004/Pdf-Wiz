@@ -4,6 +4,7 @@ FastAPI backend for PDF manipulation web application
 import os
 import uuid
 import shutil
+import zipfile
 from datetime import datetime, timedelta
 from typing import List, Optional
 from pathlib import Path
@@ -700,6 +701,25 @@ async def compare_pdfs(file1: UploadFile = File(...), file2: UploadFile = File(.
         os.remove(temp_path2)
         
         return {"output_file": output_path, "message": "PDF comparison completed successfully"}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/create-zip")
+async def create_zip(files: List[str] = Form(...)):
+    """Create a ZIP file from multiple output files"""
+    try:
+        # Create unique ZIP filename
+        zip_filename = f"outputs/download_{uuid.uuid4().hex}.zip"
+        
+        with zipfile.ZipFile(zip_filename, 'w') as zip_file:
+            for file_path in files:
+                if os.path.exists(file_path):
+                    # Add file to ZIP with just the filename (not full path)
+                    arcname = os.path.basename(file_path)
+                    zip_file.write(file_path, arcname)
+        
+        return {"zip_file": zip_filename, "message": "ZIP file created successfully"}
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

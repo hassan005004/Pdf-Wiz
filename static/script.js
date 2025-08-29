@@ -90,6 +90,8 @@ class PDFToolApp {
         } else if (tool === 'html-to-pdf') {
             // HTML to PDF doesn't need file input
             document.getElementById('upload-area').style.display = 'none';
+            // Show process button when HTML content is available
+            document.getElementById('process-btn').classList.remove('hidden');
         } else {
             fileInput.accept = '.pdf';
             fileInput.multiple = tool === 'merge';
@@ -154,6 +156,15 @@ class PDFToolApp {
             case 'html-to-pdf':
                 document.getElementById('html-input').classList.remove('hidden');
                 optionsArea.classList.remove('hidden');
+                // Add input event listener for HTML content
+                const htmlTextarea = document.getElementById('html-content');
+                htmlTextarea.addEventListener('input', () => {
+                    if (htmlTextarea.value.trim()) {
+                        document.getElementById('process-btn').classList.remove('hidden');
+                    } else {
+                        document.getElementById('process-btn').classList.add('hidden');
+                    }
+                });
                 break;
             case 'crop':
                 document.getElementById('crop-input').classList.remove('hidden');
@@ -411,6 +422,11 @@ class PDFToolApp {
         
         // Handle multiple files result
         if (result.output_files) {
+            // Add "Download All as ZIP" button for multiple files
+            if (result.output_files.length > 1) {
+                this.createZipDownloadButton(result.output_files);
+            }
+            
             result.output_files.forEach((file, index) => {
                 this.createDownloadLink(file, `Download File ${index + 1}`);
             });
@@ -439,6 +455,57 @@ class PDFToolApp {
         downloadLinks.appendChild(linkDiv);
     }
 
+    createZipDownloadButton(files) {
+        const downloadLinks = document.getElementById('download-links');
+        const zipButtonDiv = document.createElement('div');
+        zipButtonDiv.className = 'mb-4';
+        
+        zipButtonDiv.innerHTML = `
+            <button id="zip-download-btn" class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-md text-sm font-medium transition-colors">
+                <i class="fas fa-file-archive mr-2"></i>Download All as ZIP (${files.length} files)
+            </button>
+        `;
+        
+        downloadLinks.appendChild(zipButtonDiv);
+        
+        // Add click event
+        document.getElementById('zip-download-btn').addEventListener('click', () => {
+            this.downloadAsZip(files);
+        });
+    }
+    
+    async downloadAsZip(files) {
+        try {
+            document.getElementById('zip-download-btn').innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creating ZIP...';
+            
+            const formData = new FormData();
+            files.forEach(file => {
+                formData.append('files', file);
+            });
+            
+            const response = await fetch('/api/create-zip', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const link = document.createElement('a');
+                link.href = `/api/download/${data.zip_file}`;
+                link.download = data.zip_file.split('/').pop();
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                document.getElementById('zip-download-btn').innerHTML = '<i class="fas fa-check mr-2"></i>ZIP Downloaded!';
+            } else {
+                this.showError('Failed to create ZIP file');
+            }
+        } catch (error) {
+            this.showError('Error creating ZIP file: ' + error.message);
+        }
+    }
+    
     showError(message) {
         document.getElementById('progress-area').classList.add('hidden');
         document.getElementById('error-area').classList.remove('hidden');
@@ -448,3 +515,33 @@ class PDFToolApp {
 
 // Initialize app
 const app = new PDFToolApp();
+
+// Mobile menu toggle function
+function toggleMobileMenu() {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('hidden');
+    }
+}
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('sidebar');
+    const toggle = document.querySelector('.mobile-menu-toggle');
+    
+    if (window.innerWidth < 768 && sidebar && !sidebar.contains(event.target) && !toggle.contains(event.target)) {
+        sidebar.classList.add('hidden');
+    }
+});
+
+// Auto-close mobile menu on tool selection
+if (window.innerWidth < 768) {
+    document.querySelectorAll('.tool-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                sidebar.classList.add('hidden');
+            }
+        });
+    });
+}
