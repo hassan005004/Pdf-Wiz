@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Manipulation Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-gray-50">
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-lg">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold text-gray-800">PDF Tools</h1>
+            </div>
+            
+            <!-- Categories -->
+            <nav class="mt-6">
+                <div class="px-6 py-3">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Organize</h3>
+                    <ul class="mt-2 space-y-1">
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="organize">
+                            <i class="fas fa-sort mr-2"></i>Organize PDF
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="merge">
+                            <i class="fas fa-layer-group mr-2"></i>Merge PDF
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="split">
+                            <i class="fas fa-cut mr-2"></i>Split PDF
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="remove-pages">
+                            <i class="fas fa-minus-circle mr-2"></i>Remove Pages
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="extract">
+                            <i class="fas fa-file-export mr-2"></i>Extract Pages
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="rotate">
+                            <i class="fas fa-redo mr-2"></i>Rotate PDF
+                        </button></li>
+                    </ul>
+                </div>
+                
+                <div class="px-6 py-3">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Optimize</h3>
+                    <ul class="mt-2 space-y-1">
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="optimize">
+                            <i class="fas fa-rocket mr-2"></i>Optimize PDF
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="compress">
+                            <i class="fas fa-compress-arrows-alt mr-2"></i>Compress PDF
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="repair">
+                            <i class="fas fa-wrench mr-2"></i>Repair PDF
+                        </button></li>
+                    </ul>
+                </div>
+                
+                <div class="px-6 py-3">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Convert</h3>
+                    <ul class="mt-2 space-y-1">
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="jpg-to-pdf">
+                            <i class="fas fa-image mr-2"></i>JPG to PDF
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="pdf-to-jpg">
+                            <i class="fas fa-file-image mr-2"></i>PDF to JPG
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="word-to-pdf">
+                            <i class="fas fa-file-word mr-2"></i>Word to PDF
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="excel-to-pdf">
+                            <i class="fas fa-file-excel mr-2"></i>Excel to PDF
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="powerpoint-to-pdf">
+                            <i class="fas fa-file-powerpoint mr-2"></i>PowerPoint to PDF
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="html-to-pdf">
+                            <i class="fas fa-code mr-2"></i>HTML to PDF
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="pdf-to-pdfa">
+                            <i class="fas fa-archive mr-2"></i>PDF to PDF/A
+                        </button></li>
+                    </ul>
+                </div>
+                
+                <div class="px-6 py-3">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Edit</h3>
+                    <ul class="mt-2 space-y-1">
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="watermark">
+                            <i class="fas fa-tint mr-2"></i>Add Watermark
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="add-page-numbers">
+                            <i class="fas fa-list-ol mr-2"></i>Add Page Numbers
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="crop">
+                            <i class="fas fa-crop-alt mr-2"></i>Crop PDF
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="ocr">
+                            <i class="fas fa-eye mr-2"></i>OCR PDF
+                        </button></li>
+                    </ul>
+                </div>
+                
+                <div class="px-6 py-3">
+                    <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Security</h3>
+                    <ul class="mt-2 space-y-1">
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="protect">
+                            <i class="fas fa-lock mr-2"></i>Protect PDF
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="unlock">
+                            <i class="fas fa-unlock mr-2"></i>Unlock PDF
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="sign">
+                            <i class="fas fa-signature mr-2"></i>Sign PDF
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="redact">
+                            <i class="fas fa-user-secret mr-2"></i>Redact PDF
+                        </button></li>
+                        <li><button class="tool-btn w-full text-left px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-gray-100" data-tool="compare">
+                            <i class="fas fa-balance-scale mr-2"></i>Compare PDFs
+                        </button></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col">
+            <!-- Header -->
+            <header class="bg-white shadow-sm border-b border-gray-200">
+                <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+                    <h1 class="text-2xl font-semibold text-gray-900" id="tool-title">Select a tool to get started</h1>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 p-6">
+                <!-- Welcome Screen -->
+                <div id="welcome-screen" class="text-center py-20">
+                    <i class="fas fa-file-pdf text-6xl text-gray-400 mb-4"></i>
+                    <h2 class="text-3xl font-bold text-gray-700 mb-4">Welcome to PDF Tools</h2>
+                    <p class="text-gray-500 text-lg">Select a tool from the sidebar to start processing your PDFs</p>
+                </div>
+
+                <!-- Tool Interface -->
+                <div id="tool-interface" class="hidden">
+                    <!-- File Upload Area -->
+                    <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer">
+                        <input type="file" id="file-input" class="hidden" multiple accept=".pdf,.jpg,.jpeg,.png">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-lg text-gray-600 mb-2">Drop your files here or click to browse</p>
+                        <p class="text-sm text-gray-500">Supports PDF, JPG, PNG files</p>
+                    </div>
+
+                    <!-- Additional Options -->
+                    <div id="options-area" class="mt-6 hidden">
+                        <!-- Split/Extract Pages Input -->
+                        <div id="pages-input" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Page Numbers (e.g., 1,3,5-8)</label>
+                            <input type="text" id="pages" class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="1,3,5-8">
+                        </div>
+
+                        <!-- Rotation Angle -->
+                        <div id="angle-input" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Rotation Angle</label>
+                            <select id="angle" class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="90">90° Clockwise</option>
+                                <option value="180">180°</option>
+                                <option value="270">270° Clockwise (90° Counter-clockwise)</option>
+                            </select>
+                        </div>
+
+                        <!-- Password Input -->
+                        <div id="password-input" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                            <input type="password" id="password" class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter password">
+                        </div>
+
+                        <!-- Watermark Text Input -->
+                        <div id="watermark-input" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Watermark Text</label>
+                            <input type="text" id="watermark-text" class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter watermark text">
+                        </div>
+
+                        <!-- Page Order Input -->
+                        <div id="page-order-input" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Page Order (e.g., 3,1,2,4)</label>
+                            <input type="text" id="page-order" class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="3,1,2,4">
+                        </div>
+
+                        <!-- Page Numbers Position -->
+                        <div id="position-input" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Position</label>
+                            <select id="position" class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="bottom-right">Bottom Right</option>
+                                <option value="bottom-center">Bottom Center</option>
+                                <option value="bottom-left">Bottom Left</option>
+                            </select>
+                        </div>
+
+                        <!-- OCR Language -->
+                        <div id="language-input" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">OCR Language</label>
+                            <select id="language" class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="eng">English</option>
+                                <option value="spa">Spanish</option>
+                                <option value="fra">French</option>
+                                <option value="deu">German</option>
+                                <option value="chi_sim">Chinese (Simplified)</option>
+                            </select>
+                        </div>
+
+                        <!-- Signature Text -->
+                        <div id="signature-input" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Signature Text</label>
+                            <input type="text" id="signature-text" class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter signature text">
+                        </div>
+
+                        <!-- HTML Content -->
+                        <div id="html-input" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">HTML Content</label>
+                            <textarea id="html-content" rows="6" class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter HTML content"></textarea>
+                        </div>
+
+                        <!-- Crop Coordinates -->
+                        <div id="crop-input" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Crop Coordinates</label>
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="number" id="crop-left" placeholder="Left" class="border border-gray-300 rounded-md px-3 py-2">
+                                <input type="number" id="crop-right" placeholder="Right" class="border border-gray-300 rounded-md px-3 py-2">
+                                <input type="number" id="crop-bottom" placeholder="Bottom" class="border border-gray-300 rounded-md px-3 py-2">
+                                <input type="number" id="crop-top" placeholder="Top" class="border border-gray-300 rounded-md px-3 py-2">
+                            </div>
+                        </div>
+
+                        <!-- Second File for Comparison -->
+                        <div id="second-file-input" class="hidden">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Second PDF File</label>
+                            <input type="file" id="second-file" accept=".pdf" class="block w-full border border-gray-300 rounded-md px-3 py-2">
+                        </div>
+                    </div>
+
+                    <!-- Selected Files -->
+                    <div id="selected-files" class="mt-6 hidden">
+                        <h3 class="text-lg font-medium text-gray-700 mb-3">Selected Files</h3>
+                        <div id="file-list" class="space-y-2"></div>
+                    </div>
+
+                    <!-- Process Button -->
+                    <div class="mt-6">
+                        <button id="process-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hidden">
+                            <i class="fas fa-cog mr-2"></i>Process Files
+                        </button>
+                    </div>
+
+                    <!-- Progress -->
+                    <div id="progress-area" class="mt-6 hidden">
+                        <div class="bg-gray-200 rounded-full h-2">
+                            <div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <p id="progress-text" class="text-sm text-gray-600 mt-2">Processing...</p>
+                    </div>
+
+                    <!-- Results -->
+                    <div id="results-area" class="mt-6 hidden">
+                        <h3 class="text-lg font-medium text-gray-700 mb-3">Results</h3>
+                        <div id="download-links" class="space-y-2"></div>
+                    </div>
+
+                    <!-- Error Messages -->
+                    <div id="error-area" class="mt-6 hidden">
+                        <div class="bg-red-50 border border-red-200 rounded-md p-4">
+                            <div class="flex">
+                                <i class="fas fa-exclamation-circle text-red-400 mr-2 mt-1"></i>
+                                <div>
+                                    <h3 class="text-sm font-medium text-red-800">Error</h3>
+                                    <p id="error-message" class="text-sm text-red-700 mt-1"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

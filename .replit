@@ -1,2 +1,39 @@
+modules = ["python-3.11"]
 [agent]
 expertMode = true
+
+[nix]
+channel = "stable-25_05"
+packages = ["fontconfig", "freetype", "ghostscript", "glib", "glibcLocales", "harfbuzz", "jbig2dec", "lcms2", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "mupdf", "openjpeg", "pango", "poppler_utils", "qpdf", "tcl", "tesseract", "tk", "zlib"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "PDF Manipulation Server"
+
+[[workflows.workflow]]
+name = "PDF Manipulation Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pip install fastapi uvicorn python-multipart PyPDF2 Pillow && python main.py"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[ports]]
+localPort = 5000
+externalPort = 5000
+
+[[ports]]
+localPort = 8000
+externalPort = 80
