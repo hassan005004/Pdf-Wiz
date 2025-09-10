@@ -23,6 +23,64 @@ class PDFToolApp {
 
     init() {
         this.bindEvents();
+        this.createHomeButton();
+    }
+
+    createHomeButton() {
+        // Create home button if it doesn't exist
+        if (!document.getElementById('home-button')) {
+            const homeButton = document.createElement('button');
+            homeButton.id = 'home-button';
+            homeButton.className = 'home-button';
+            homeButton.innerHTML = `
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+            `;
+            homeButton.addEventListener('click', this.goHome.bind(this));
+            document.body.appendChild(homeButton);
+        }
+    }
+    
+    showHomeButton() {
+        const homeButton = document.getElementById('home-button');
+        if (homeButton) {
+            setTimeout(() => {
+                homeButton.classList.add('visible');
+            }, 400);
+        }
+    }
+    
+    hideHomeButton() {
+        const homeButton = document.getElementById('home-button');
+        if (homeButton) {
+            homeButton.classList.remove('visible');
+        }
+    }
+    
+    goHome() {
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const toolInterface = document.getElementById('tool-interface');
+        
+        // Add exit animation for tool interface
+        toolInterface.style.opacity = '0';
+        toolInterface.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            toolInterface.classList.add('hidden');
+            welcomeScreen.classList.remove('hidden');
+            welcomeScreen.style.opacity = '0';
+            welcomeScreen.style.transform = 'translateY(-20px)';
+            
+            setTimeout(() => {
+                welcomeScreen.style.opacity = '1';
+                welcomeScreen.style.transform = 'translateY(0)';
+            }, 50);
+        }, 300);
+        
+        this.hideHomeButton();
+        this.resetInterface();
+        this.currentTool = null;
     }
 
     bindEvents() {
@@ -107,11 +165,39 @@ class PDFToolApp {
 
     selectTool(tool) {
         this.currentTool = tool;
+        
+        // Add tool selection animation
+        const selectedCard = document.querySelector(`[data-tool="${tool}"]`);
+        if (selectedCard && selectedCard.classList.contains('tool-card')) {
+            selectedCard.classList.add('selected');
+            setTimeout(() => {
+                selectedCard.classList.remove('selected');
+            }, 600);
+        }
+        
         this.resetInterface();
         
-        // Update UI
-        document.getElementById('welcome-screen').classList.add('hidden');
-        document.getElementById('tool-interface').classList.remove('hidden');
+        // Show home button with animation
+        this.showHomeButton();
+        
+        // Update UI with smooth transition
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const toolInterface = document.getElementById('tool-interface');
+        
+        welcomeScreen.style.opacity = '0';
+        welcomeScreen.style.transform = 'translateY(-20px)';
+        
+        setTimeout(() => {
+            welcomeScreen.classList.add('hidden');
+            toolInterface.classList.remove('hidden');
+            toolInterface.style.opacity = '0';
+            toolInterface.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                toolInterface.style.opacity = '1';
+                toolInterface.style.transform = 'translateY(0)';
+            }, 50);
+        }, 300);
         
         // Update title and description
         const titles = {
@@ -743,7 +829,11 @@ class PDFToolApp {
         });
         
         const processBtn = document.getElementById('process-btn');
-        if (processBtn) processBtn.classList.add('hidden');
+        if (processBtn) {
+            processBtn.classList.add('hidden');
+            processBtn.classList.remove('processing');
+            processBtn.disabled = false;
+        }
         
         // Reset file input
         const fileInput = document.getElementById('file-input');
@@ -758,6 +848,11 @@ class PDFToolApp {
         this.deletedPages.clear();
         this.isThumbviewView = true;
         
+        // Remove processing animations from all tool cards
+        document.querySelectorAll('.tool-card').forEach(card => {
+            card.classList.remove('processing', 'selected');
+        });
+        
         const pdfPreviewSection = document.getElementById('pdf-preview-section');
         const pdfPreviewPlaceholder = document.getElementById('pdf-preview-placeholder');
         if (pdfPreviewSection) pdfPreviewSection.classList.add('hidden');
@@ -765,6 +860,23 @@ class PDFToolApp {
     }
 
     processFiles() {
+        // Add processing animation to button
+        const processBtn = document.getElementById('process-btn');
+        if (processBtn) {
+            processBtn.classList.add('processing');
+            processBtn.disabled = true;
+            const originalText = processBtn.innerHTML;
+            processBtn.innerHTML = `
+                <span style="opacity: 0;">Processing...</span>
+            `;
+        }
+        
+        // Add processing animation to selected tool card
+        const selectedCard = document.querySelector(`[data-tool="${this.currentTool}"]`);
+        if (selectedCard && selectedCard.classList.contains('tool-card')) {
+            selectedCard.classList.add('processing');
+        }
+        
         const formData = new FormData();
         
         // Add files to form data
@@ -874,6 +986,7 @@ class PDFToolApp {
             console.error('Processing error:', error);
             this.showError(`Processing failed: ${error.message}`);
         } finally {
+            this.cleanupProcessingAnimations();
             document.getElementById('progress-area').classList.add('hidden');
         }
     }
@@ -955,6 +1068,28 @@ class PDFToolApp {
         if (errorArea && errorMessage) {
             errorMessage.textContent = message;
             errorArea.classList.remove('hidden');
+        }
+    }
+    
+    cleanupProcessingAnimations() {
+        // Remove processing animation from button
+        const processBtn = document.getElementById('process-btn');
+        if (processBtn) {
+            processBtn.classList.remove('processing');
+            processBtn.disabled = false;
+            processBtn.innerHTML = `
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                Process Files
+            `;
+        }
+        
+        // Remove processing animation from tool card
+        const selectedCard = document.querySelector(`[data-tool="${this.currentTool}"]`);
+        if (selectedCard && selectedCard.classList.contains('tool-card')) {
+            selectedCard.classList.remove('processing');
         }
     }
     

@@ -251,9 +251,9 @@ body {
     }
 }
 
-/* Enhanced Tool Buttons */
+/* Enhanced Tool Buttons with Advanced Animations */
 .tool-btn {
-    transition: var(--transition);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: var(--radius-md);
     position: relative;
     overflow: hidden;
@@ -294,10 +294,249 @@ body {
     transform: scale(1.1);
 }
 
+/* Tool Card Animations */
+.tool-card {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.tool-card::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+}
+
+.tool-card:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.tool-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.25);
+    border-color: var(--primary-color);
+}
+
+.tool-card.selected {
+    animation: toolSelected 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(99, 102, 241, 0.05));
+}
+
+.tool-card.processing {
+    animation: toolProcessing 2s infinite;
+    border-color: var(--success-color);
+}
+
+@keyframes toolSelected {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    50% {
+        transform: scale(1.05) rotateY(5deg);
+        box-shadow: 0 20px 40px -12px rgba(59, 130, 246, 0.4);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 10px 20px -8px rgba(59, 130, 246, 0.3);
+    }
+}
+
+@keyframes toolProcessing {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 15px 30px -10px rgba(16, 185, 129, 0.4);
+    }
+}
+
+/* Stylish Home Button */
+.home-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    opacity: 0;
+    transform: scale(0) rotate(-180deg);
+    pointer-events: none;
+}
+
+.home-button.visible {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+    pointer-events: all;
+}
+
+.home-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.home-button:hover {
+    transform: scale(1.15) rotateY(10deg);
+    box-shadow: 0 15px 40px rgba(59, 130, 246, 0.5);
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+}
+
+.home-button:hover::before {
+    opacity: 1;
+}
+
+.home-button:active {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
+
+.home-button svg {
+    transition: all 0.3s ease;
+}
+
+.home-button:hover svg {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Processing Button Animations */
+.process-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.process-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s;
+}
+
+.process-btn:hover::before {
+    left: 100%;
+}
+
+.process-btn.processing {
+    animation: pulseProcessing 2s infinite;
+    background: linear-gradient(135deg, var(--success-color), #14b8a6);
+}
+
+.process-btn.processing::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid transparent;
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes pulseProcessing {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Enhanced Mega Menu Animations */
+.mega-menu-item {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.mega-menu-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+.mega-menu-item:hover::before {
+    left: 100%;
+}
+
+.mega-menu-item:hover {
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    transform: translateX(8px) scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.mega-menu-item:active {
+    animation: menuItemClick 0.3s ease;
+}
+
+@keyframes menuItemClick {
+    0% { transform: translateX(8px) scale(1.02); }
+    50% { transform: translateX(12px) scale(1.05); }
+    100% { transform: translateX(8px) scale(1.02); }
+}
+
 @media (max-width: 768px) {
     .tool-btn {
         padding: 0.875rem 1rem;
         font-size: 0.9rem;
+    }
+    
+    .home-button {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+        top: 15px;
+        left: 15px;
+    }
+    
+    .tool-card:hover {
+        transform: translateY(-4px) scale(1.01);
     }
 }
 
