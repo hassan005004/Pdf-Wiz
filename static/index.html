@@ -11,9 +11,484 @@
 <body class="bg-gray-50 min-h-screen">
     <!-- Header -->
     <header class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <h1 class="text-3xl font-bold text-gray-900">PDF Tools</h1>
-            <p class="text-gray-600 mt-1">Professional PDF processing and manipulation</p>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Top header with title and mega menu toggle -->
+            <div class="flex items-center justify-between py-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">PDF Tools</h1>
+                    <p class="text-gray-600 mt-1">Professional PDF processing and manipulation</p>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <button id="mobile-menu-toggle" class="md:hidden bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Mega Menu Navigation -->
+            <nav class="hidden md:block border-t border-gray-100 pt-4 pb-2">
+                <div class="flex items-center space-x-8">
+                    <!-- Create/Convert Category -->
+                    <div class="relative group">
+                        <button class="flex items-center px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-all">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                            </svg>
+                            Create & Convert
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div class="absolute left-0 mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <div class="p-4">
+                                <h3 class="font-semibold text-gray-900 mb-3">Create & Convert</h3>
+                                <div class="grid grid-cols-1 gap-2">
+                                    <button class="mega-menu-item" data-tool="merge">
+                                        <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">Merge PDF</div>
+                                            <div class="text-sm text-gray-500">Combine multiple PDFs</div>
+                                        </div>
+                                    </button>
+                                    <button class="mega-menu-item" data-tool="word-to-pdf">
+                                        <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">Word to PDF</div>
+                                            <div class="text-sm text-gray-500">Convert Word documents</div>
+                                        </div>
+                                    </button>
+                                    <button class="mega-menu-item" data-tool="excel-to-pdf">
+                                        <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">Excel to PDF</div>
+                                            <div class="text-sm text-gray-500">Convert spreadsheets</div>
+                                        </div>
+                                    </button>
+                                    <button class="mega-menu-item" data-tool="powerpoint-to-pdf">
+                                        <svg class="w-5 h-5 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">PowerPoint to PDF</div>
+                                            <div class="text-sm text-gray-500">Convert presentations</div>
+                                        </div>
+                                    </button>
+                                    <button class="mega-menu-item" data-tool="jpg-to-pdf">
+                                        <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">JPG to PDF</div>
+                                            <div class="text-sm text-gray-500">Convert images</div>
+                                        </div>
+                                    </button>
+                                    <button class="mega-menu-item" data-tool="html-to-pdf">
+                                        <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">HTML to PDF</div>
+                                            <div class="text-sm text-gray-500">Convert web content</div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit & Organize Category -->
+                    <div class="relative group">
+                        <button class="flex items-center px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-all">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                            Edit & Organize
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        
+                        <div class="absolute left-0 mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <div class="p-4">
+                                <h3 class="font-semibold text-gray-900 mb-3">Edit & Organize</h3>
+                                <div class="grid grid-cols-1 gap-2">
+                                    <button class="mega-menu-item" data-tool="split">
+                                        <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">Split PDF</div>
+                                            <div class="text-sm text-gray-500">Split into pages or ranges</div>
+                                        </div>
+                                    </button>
+                                    <button class="mega-menu-item" data-tool="organize">
+                                        <svg class="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">Organize PDF</div>
+                                            <div class="text-sm text-gray-500">Reorder pages</div>
+                                        </div>
+                                    </button>
+                                    <button class="mega-menu-item" data-tool="extract">
+                                        <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">Extract Pages</div>
+                                            <div class="text-sm text-gray-500">Extract specific pages</div>
+                                        </div>
+                                    </button>
+                                    <button class="mega-menu-item" data-tool="remove-pages">
+                                        <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">Remove Pages</div>
+                                            <div class="text-sm text-gray-500">Delete unwanted pages</div>
+                                        </div>
+                                    </button>
+                                    <button class="mega-menu-item" data-tool="rotate">
+                                        <svg class="w-5 h-5 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">Rotate PDF</div>
+                                            <div class="text-sm text-gray-500">Rotate pages</div>
+                                        </div>
+                                    </button>
+                                    <button class="mega-menu-item" data-tool="crop">
+                                        <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">Crop PDF</div>
+                                            <div class="text-sm text-gray-500">Crop and trim pages</div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security & Protection Category -->
+                    <div class="relative group">
+                        <button class="flex items-center px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-all">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                            Security
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        
+                        <div class="absolute left-0 mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <div class="p-4">
+                                <h3 class="font-semibold text-gray-900 mb-3">Security & Protection</h3>
+                                <div class="grid grid-cols-1 gap-2">
+                                    <button class="mega-menu-item" data-tool="protect">
+                                        <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">Protect PDF</div>
+                                            <div class="text-sm text-gray-500">Add password protection</div>
+                                        </div>
+                                    </button>
+                                    <button class="mega-menu-item" data-tool="unlock">
+                                        <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">Unlock PDF</div>
+                                            <div class="text-sm text-gray-500">Remove password protection</div>
+                                        </div>
+                                    </button>
+                                    <button class="mega-menu-item" data-tool="watermark">
+                                        <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">Add Watermark</div>
+                                            <div class="text-sm text-gray-500">Add text or image watermarks</div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enhance & Optimize Category -->
+                    <div class="relative group">
+                        <button class="flex items-center px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-all">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            Enhance
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        
+                        <div class="absolute left-0 mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <div class="p-4">
+                                <h3 class="font-semibold text-gray-900 mb-3">Enhance & Optimize</h3>
+                                <div class="grid grid-cols-1 gap-2">
+                                    <button class="mega-menu-item" data-tool="compress">
+                                        <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">Compress PDF</div>
+                                            <div class="text-sm text-gray-500">Reduce file size</div>
+                                        </div>
+                                    </button>
+                                    <button class="mega-menu-item" data-tool="optimize">
+                                        <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">Optimize PDF</div>
+                                            <div class="text-sm text-gray-500">Optimize for web or print</div>
+                                        </div>
+                                    </button>
+                                    <button class="mega-menu-item" data-tool="ocr">
+                                        <svg class="w-5 h-5 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">OCR PDF</div>
+                                            <div class="text-sm text-gray-500">Make scanned PDFs searchable</div>
+                                        </div>
+                                    </button>
+                                    <button class="mega-menu-item" data-tool="repair">
+                                        <svg class="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">Repair PDF</div>
+                                            <div class="text-sm text-gray-500">Fix corrupted files</div>
+                                        </div>
+                                    </button>
+                                    <button class="mega-menu-item" data-tool="add-page-numbers">
+                                        <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">Add Page Numbers</div>
+                                            <div class="text-sm text-gray-500">Number your pages</div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Convert From PDF Category -->
+                    <div class="relative group">
+                        <button class="flex items-center px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-all">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                            </svg>
+                            Export
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        
+                        <div class="absolute left-0 mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <div class="p-4">
+                                <h3 class="font-semibold text-gray-900 mb-3">Export & Convert</h3>
+                                <div class="grid grid-cols-1 gap-2">
+                                    <button class="mega-menu-item" data-tool="pdf-to-word">
+                                        <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">PDF to Word</div>
+                                            <div class="text-sm text-gray-500">Convert to editable Word</div>
+                                        </div>
+                                    </button>
+                                    <button class="mega-menu-item" data-tool="pdf-to-jpg">
+                                        <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">PDF to JPG</div>
+                                            <div class="text-sm text-gray-500">Convert pages to images</div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Compare Category -->
+                    <div class="relative group">
+                        <button class="flex items-center px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-all">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                            Compare
+                        </button>
+                        
+                        <div class="absolute left-0 mt-2 w-72 bg-white rounded-xl shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <div class="p-4">
+                                <h3 class="font-semibold text-gray-900 mb-3">Compare & Analyze</h3>
+                                <div class="grid grid-cols-1 gap-2">
+                                    <button class="mega-menu-item" data-tool="compare">
+                                        <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
+                                        </svg>
+                                        <div>
+                                            <div class="font-medium">Compare PDFs</div>
+                                            <div class="text-sm text-gray-500">Compare two PDFs side by side</div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="md:hidden hidden bg-gray-50 border-t border-gray-200 mt-4 pt-4 pb-6">
+                <div class="space-y-4">
+                    <!-- Mobile Create & Convert -->
+                    <div>
+                        <button class="mobile-category-toggle w-full flex items-center justify-between px-4 py-2 text-left font-medium text-gray-900 bg-white rounded-lg border border-gray-200">
+                            <span class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                </svg>
+                                Create & Convert
+                            </span>
+                            <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div class="mobile-category-content hidden mt-2 pl-4 space-y-2">
+                            <button class="mobile-menu-item" data-tool="merge">Merge PDF</button>
+                            <button class="mobile-menu-item" data-tool="word-to-pdf">Word to PDF</button>
+                            <button class="mobile-menu-item" data-tool="excel-to-pdf">Excel to PDF</button>
+                            <button class="mobile-menu-item" data-tool="powerpoint-to-pdf">PowerPoint to PDF</button>
+                            <button class="mobile-menu-item" data-tool="jpg-to-pdf">JPG to PDF</button>
+                            <button class="mobile-menu-item" data-tool="html-to-pdf">HTML to PDF</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Mobile Edit & Organize -->
+                    <div>
+                        <button class="mobile-category-toggle w-full flex items-center justify-between px-4 py-2 text-left font-medium text-gray-900 bg-white rounded-lg border border-gray-200">
+                            <span class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                                Edit & Organize
+                            </span>
+                            <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div class="mobile-category-content hidden mt-2 pl-4 space-y-2">
+                            <button class="mobile-menu-item" data-tool="split">Split PDF</button>
+                            <button class="mobile-menu-item" data-tool="organize">Organize PDF</button>
+                            <button class="mobile-menu-item" data-tool="extract">Extract Pages</button>
+                            <button class="mobile-menu-item" data-tool="remove-pages">Remove Pages</button>
+                            <button class="mobile-menu-item" data-tool="rotate">Rotate PDF</button>
+                            <button class="mobile-menu-item" data-tool="crop">Crop PDF</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Mobile Security -->
+                    <div>
+                        <button class="mobile-category-toggle w-full flex items-center justify-between px-4 py-2 text-left font-medium text-gray-900 bg-white rounded-lg border border-gray-200">
+                            <span class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                                Security
+                            </span>
+                            <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div class="mobile-category-content hidden mt-2 pl-4 space-y-2">
+                            <button class="mobile-menu-item" data-tool="protect">Protect PDF</button>
+                            <button class="mobile-menu-item" data-tool="unlock">Unlock PDF</button>
+                            <button class="mobile-menu-item" data-tool="watermark">Add Watermark</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Mobile Enhance -->
+                    <div>
+                        <button class="mobile-category-toggle w-full flex items-center justify-between px-4 py-2 text-left font-medium text-gray-900 bg-white rounded-lg border border-gray-200">
+                            <span class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                                Enhance
+                            </span>
+                            <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div class="mobile-category-content hidden mt-2 pl-4 space-y-2">
+                            <button class="mobile-menu-item" data-tool="compress">Compress PDF</button>
+                            <button class="mobile-menu-item" data-tool="optimize">Optimize PDF</button>
+                            <button class="mobile-menu-item" data-tool="ocr">OCR PDF</button>
+                            <button class="mobile-menu-item" data-tool="repair">Repair PDF</button>
+                            <button class="mobile-menu-item" data-tool="add-page-numbers">Add Page Numbers</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Mobile Export -->
+                    <div>
+                        <button class="mobile-category-toggle w-full flex items-center justify-between px-4 py-2 text-left font-medium text-gray-900 bg-white rounded-lg border border-gray-200">
+                            <span class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                </svg>
+                                Export
+                            </span>
+                            <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        <div class="mobile-category-content hidden mt-2 pl-4 space-y-2">
+                            <button class="mobile-menu-item" data-tool="pdf-to-word">PDF to Word</button>
+                            <button class="mobile-menu-item" data-tool="pdf-to-jpg">PDF to JPG</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Mobile Compare -->
+                    <div>
+                        <button class="mobile-category-toggle w-full flex items-center justify-between px-4 py-2 text-left font-medium text-gray-900 bg-white rounded-lg border border-gray-200">
+                            <span class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                </svg>
+                                Compare
+                            </span>
+                        </button>
+                        <div class="mt-2 pl-4 space-y-2">
+                            <button class="mobile-menu-item" data-tool="compare">Compare PDFs</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 

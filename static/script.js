@@ -34,6 +34,44 @@ class PDFToolApp {
             });
         });
 
+        // Mega menu tool selection
+        document.querySelectorAll('.mega-menu-item, .mobile-menu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const tool = e.currentTarget.dataset.tool;
+                if (tool) {
+                    this.selectTool(tool);
+                    // Close mobile menu if open
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    if (mobileMenu) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+        });
+
+        // Mobile menu toggle
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenuToggle && mobileMenu) {
+            mobileMenuToggle.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        // Mobile category toggles
+        document.querySelectorAll('.mobile-category-toggle').forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                const content = e.currentTarget.nextElementSibling;
+                const icon = e.currentTarget.querySelector('svg:last-child');
+                
+                if (content && content.classList.contains('mobile-category-content')) {
+                    content.classList.toggle('hidden');
+                    icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+                    e.currentTarget.setAttribute('aria-expanded', !content.classList.contains('hidden'));
+                }
+            });
+        });
+
         // File upload
         const uploadArea = document.getElementById('upload-area');
         const fileInput = document.getElementById('file-input');

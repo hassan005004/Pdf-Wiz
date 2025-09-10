@@ -689,6 +689,133 @@ body {
     }
 }
 
+/* Mega Menu Styles */
+.mega-menu-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 12px;
+    text-align: left;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.mega-menu-item:hover {
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.mega-menu-item svg {
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.mega-menu-item div {
+    flex: 1;
+}
+
+.mega-menu-item .font-medium {
+    color: #1f2937;
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.mega-menu-item .text-sm {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+/* Mobile Menu Styles */
+.mobile-menu-item {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    text-align: left;
+    color: #374151;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.mobile-menu-item:hover {
+    background: #e5e7eb;
+    transform: translateX(4px);
+}
+
+.mobile-category-toggle svg {
+    transition: transform 0.2s ease;
+}
+
+.mobile-category-toggle[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+}
+
+/* Dropdown animations */
+.group:hover .group-hover\:opacity-100 {
+    opacity: 1;
+}
+
+.group:hover .group-hover\:visible {
+    visibility: visible;
+}
+
+/* Z-index management */
+.relative {
+    position: relative;
+}
+
+nav .absolute {
+    z-index: 50;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .mega-menu-item {
+        padding: 10px;
+    }
+    
+    .mega-menu-item svg {
+        margin-right: 8px;
+    }
+    
+    .mobile-category-content {
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
+
+/* Focus states for accessibility */
+.mega-menu-item:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.mobile-menu-item:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Hover effects for desktop navigation buttons */
+nav button:hover {
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+}
+
 /* Comparison view styles */
 .comparison-view {
     animation: expandIn 0.4s ease-out;
