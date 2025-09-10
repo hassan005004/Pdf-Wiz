@@ -359,24 +359,80 @@
                     </div>
                 </div>
 
-                <!-- PDF Preview Area -->
+                <!-- Enhanced PDF Preview Area -->
                 <div>
                     <div id="pdf-preview-section" class="hidden">
-                        <h3 class="text-lg font-medium text-gray-700 mb-3">PDF Preview</h3>
-                        <div id="pdf-preview-container" class="bg-white border-2 border-gray-200 rounded-lg p-4 min-h-96">
-                            <canvas id="pdf-canvas" class="max-w-full mx-auto"></canvas>
-                            <div id="pdf-navigation" class="mt-4 flex justify-between items-center">
-                                <button id="prev-page" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50" disabled>Previous</button>
-                                <span id="page-info" class="text-gray-600">Page 1 of 1</span>
-                                <button id="next-page" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50" disabled>Next</button>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">PDF Preview & Editor</h3>
+                            <div class="flex items-center space-x-2">
+                                <button id="view-mode-toggle" class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors">
+                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                                    </svg>
+                                    Thumbnail View
+                                </button>
+                                <span id="page-count-badge" class="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full font-medium">0 pages</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Thumbnail Grid View -->
+                        <div id="thumbnail-view" class="bg-white border-2 border-gray-200 rounded-xl p-6">
+                            <div class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                <div class="flex items-center">
+                                    <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <div>
+                                        <p class="text-sm font-medium text-blue-800">Interactive PDF Editor</p>
+                                        <p class="text-xs text-blue-600">Drag pages to reorder • Click the × to delete pages • Changes are applied in real-time</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="pages-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 min-h-32">
+                                <!-- Page thumbnails will be inserted here -->
+                            </div>
+                            
+                            <div id="pages-empty-state" class="text-center py-12">
+                                <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <p class="text-gray-500 font-medium">Upload a PDF to start editing</p>
+                                <p class="text-gray-400 text-sm mt-1">You'll be able to reorder and delete pages</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Single Page View -->
+                        <div id="single-page-view" class="hidden bg-white border-2 border-gray-200 rounded-xl p-6">
+                            <div class="flex justify-center mb-4">
+                                <canvas id="pdf-canvas" class="border border-gray-300 rounded-lg shadow-sm max-w-full"></canvas>
+                            </div>
+                            <div id="pdf-navigation" class="flex justify-between items-center">
+                                <button id="prev-page" class="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" disabled>
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                    </svg>
+                                    Previous
+                                </button>
+                                <span id="page-info" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium">Page 1 of 1</span>
+                                <button id="next-page" class="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" disabled>
+                                    Next
+                                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <div id="pdf-preview-placeholder" class="bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg p-8 text-center">
-                        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        <p class="text-gray-500">PDF preview will appear here</p>
+                    
+                    <div id="pdf-preview-placeholder" class="bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-dashed border-gray-200 rounded-xl p-12 text-center">
+                        <div class="max-w-sm mx-auto">
+                            <svg class="w-20 h-20 text-gray-300 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <h4 class="text-lg font-semibold text-gray-700 mb-2">PDF Preview</h4>
+                            <p class="text-gray-500">Upload a PDF file to see an interactive preview with page management capabilities</p>
+                        </div>
                     </div>
                 </div>
             </div>

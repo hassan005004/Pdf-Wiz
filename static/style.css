@@ -889,3 +889,369 @@ body {
         transform: none;
     }
 }
+
+/* Enhanced PDF Thumbnail Styles */
+.pdf-page-thumbnail {
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: grab;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 2px solid transparent;
+    aspect-ratio: 0.7;
+}
+
+.pdf-page-thumbnail:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
+    border-color: var(--primary-color);
+}
+
+.pdf-page-thumbnail:active {
+    cursor: grabbing;
+    transform: rotate(3deg) scale(1.05);
+    z-index: 1000;
+}
+
+.pdf-page-thumbnail.dragging {
+    opacity: 0.9;
+    transform: rotate(8deg) scale(1.1);
+    z-index: 1000;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border-color: var(--primary-color);
+}
+
+.pdf-page-thumbnail canvas {
+    border-radius: 8px;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Page number overlay */
+.page-number {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Delete button styling */
+.delete-page-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.pdf-page-thumbnail:hover .delete-page-btn {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.delete-page-btn:hover {
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    transform: scale(1.25);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.delete-page-btn:active {
+    transform: scale(1.1);
+}
+
+/* Drop zones for reordering */
+.drop-zone-indicator {
+    position: absolute;
+    top: 0;
+    left: -4px;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+    border-radius: 2px;
+    opacity: 0;
+    transform: scaleY(0);
+    transition: all 0.3s ease;
+}
+
+.drop-zone-indicator.active {
+    opacity: 1;
+    transform: scaleY(1);
+    box-shadow: 0 0 12px var(--primary-color);
+}
+
+.drop-zone-indicator.right {
+    left: auto;
+    right: -4px;
+}
+
+/* Thumbnail grid enhancements */
+.pages-grid {
+    transition: all 0.3s ease;
+}
+
+.pages-grid.reordering {
+    padding: 20px;
+    background: linear-gradient(135deg, var(--surface-soft), #f8fafc);
+    border-radius: 16px;
+    border: 2px dashed var(--border-soft);
+}
+
+/* View mode toggle enhancements */
+.view-mode-toggle {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.view-mode-toggle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.5s;
+}
+
+.view-mode-toggle:hover::before {
+    left: 100%;
+}
+
+.view-mode-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.25);
+}
+
+/* Page count badge */
+.page-count-badge {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.page-count-badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.page-count-badge:hover::before {
+    left: 100%;
+}
+
+/* Enhanced single page view */
+.single-page-view canvas {
+    max-width: 100%;
+    max-height: 600px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.single-page-view canvas:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+}
+
+/* Navigation buttons enhancement */
+.pdf-nav-btn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.pdf-nav-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.pdf-nav-btn:hover::before {
+    left: 100%;
+}
+
+.pdf-nav-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+}
+
+.pdf-nav-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* Loading states for thumbnails */
+.thumbnail-loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 12px;
+    aspect-ratio: 0.7;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* Empty state styling */
+.pages-empty-state {
+    transition: all 0.3s ease;
+}
+
+.pages-empty-state:hover {
+    transform: translateY(-4px);
+}
+
+.pages-empty-state svg {
+    transition: all 0.3s ease;
+}
+
+.pages-empty-state:hover svg {
+    transform: scale(1.05);
+    color: var(--primary-color);
+}
+
+/* Interactive features info box */
+.info-box {
+    background: linear-gradient(135deg, var(--surface), rgba(59, 130, 246, 0.05));
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.info-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+/* Responsive adjustments for thumbnails */
+@media (max-width: 640px) {
+    .pdf-page-thumbnail {
+        border-radius: 8px;
+    }
+    
+    .page-number {
+        font-size: 10px;
+        padding: 3px 6px;
+        border-radius: 8px;
+    }
+    
+    .delete-page-btn {
+        width: 24px;
+        height: 24px;
+        top: 6px;
+        right: 6px;
+    }
+    
+    .pages-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pages-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .pdf-page-thumbnail {
+        max-width: 280px;
+        margin: 0 auto;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .pdf-page-thumbnail {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .page-number {
+        background: linear-gradient(135deg, #1f2937, #111827);
+        border-color: #374151;
+    }
+    
+    .info-box {
+        background: linear-gradient(135deg, #1f2937, rgba(59, 130, 246, 0.1));
+        border-color: rgba(59, 130, 246, 0.2);
+    }
+}
+
+/* High contrast mode for thumbnails */
+@media (prefers-contrast: high) {
+    .pdf-page-thumbnail {
+        border-width: 3px;
+        border-color: #000;
+    }
+    
+    .delete-page-btn {
+        border: 2px solid #fff;
+    }
+    
+    .page-number {
+        border: 1px solid #000;
+    }
+}
+
+/* Reduced motion support for thumbnails */
+@media (prefers-reduced-motion: reduce) {
+    .pdf-page-thumbnail,
+    .delete-page-btn,
+    .page-number,
+    .view-mode-toggle {
+        transition: none;
+        animation: none;
+    }
+    
+    .pdf-page-thumbnail:hover,
+    .pdf-page-thumbnail:active {
+        transform: none;
+    }
+    
+    .thumbnail-loading {
+        animation: none;
+        background: #f0f0f0;
+    }
+}
