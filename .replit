@@ -24,7 +24,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "pip install fastapi uvicorn python-multipart PyPDF2 Pillow && python main.py"
+args = "source .pythonlibs/bin/activate && python main.py"
 waitForPort = 5000
 
 [workflows.workflow.metadata]
@@ -32,8 +32,4 @@ outputType = "webview"
 
 [[ports]]
 localPort = 5000
-externalPort = 5000
-
-[[ports]]
-localPort = 8000
 externalPort = 80
