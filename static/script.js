@@ -1,5 +1,5 @@
 /**
- * PDF Manipulation Tool Frontend
+ * Enhanced PDF Manipulation Tool Frontend with Interactive Page Management
  */
 
 // Configure PDF.js worker
@@ -14,6 +14,10 @@ class PDFToolApp {
         this.currentPDF = null;
         this.currentPage = 1;
         this.totalPages = 0;
+        this.isThumbviewView = true;
+        this.pageOrder = []; // Track current page order
+        this.deletedPages = new Set(); // Track deleted pages
+        this.draggedPageIndex = null;
         this.init();
     }
 
@@ -48,7 +52,13 @@ class PDFToolApp {
             processBtn.addEventListener('click', this.processFiles.bind(this));
         }
 
-        // PDF navigation
+        // View mode toggle
+        const viewModeToggle = document.getElementById('view-mode-toggle');
+        if (viewModeToggle) {
+            viewModeToggle.addEventListener('click', this.toggleViewMode.bind(this));
+        }
+
+        // PDF navigation for single page view
         const prevBtn = document.getElementById('prev-page');
         const nextBtn = document.getElementById('next-page');
         if (prevBtn && nextBtn) {
@@ -299,15 +309,260 @@ class PDFToolApp {
             this.totalPages = pdf.numPages;
             this.currentPage = 1;
 
+            // Initialize page order (all pages in original order)
+            this.pageOrder = Array.from({length: this.totalPages}, (_, i) => i + 1);
+            this.deletedPages.clear();
+
             document.getElementById('pdf-preview-section').classList.remove('hidden');
             document.getElementById('pdf-preview-placeholder').classList.add('hidden');
 
-            await this.renderPage(1);
-            this.updateNavigationButtons();
-            this.updatePageInfo();
+            // Update page count badge
+            this.updatePageCountBadge();
+
+            // Show thumbnail view by default
+            if (this.isThumbviewView) {
+                await this.renderThumbnailView();
+            } else {
+                await this.renderPage(1);
+                this.updateNavigationButtons();
+                this.updatePageInfo();
+            }
         } catch (error) {
             console.error('Error loading PDF:', error);
             this.showError('Failed to load PDF preview');
+        }
+    }
+
+    async renderThumbnailView() {
+        if (!this.currentPDF) return;
+
+        const pagesGrid = document.getElementById('pages-grid');
+        const emptyState = document.getElementById('pages-empty-state');
+        
+        if (!pagesGrid) return;
+
+        // Show loading state
+        pagesGrid.innerHTML = '';
+        for (let i = 0; i < this.totalPages; i++) {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'thumbnail-loading';
+            pagesGrid.appendChild(loadingDiv);
+        }
+
+        emptyState.classList.add('hidden');
+
+        // Render all pages as thumbnails
+        const thumbnails = [];
+        for (let pageNum of this.pageOrder) {
+            if (this.deletedPages.has(pageNum)) continue;
+            
+            try {
+                const page = await this.currentPDF.getPage(pageNum);
+                const thumbnail = await this.createPageThumbnail(page, pageNum);
+                thumbnails.push(thumbnail);
+            } catch (error) {
+                console.error(`Error rendering page ${pageNum}:`, error);
+            }
+        }
+
+        // Clear loading state and add thumbnails
+        pagesGrid.innerHTML = '';
+        thumbnails.forEach(thumbnail => {
+            pagesGrid.appendChild(thumbnail);
+        });
+
+        if (thumbnails.length === 0) {
+            emptyState.classList.remove('hidden');
+        }
+    }
+
+    async createPageThumbnail(page, pageNum) {
+        const viewport = page.getViewport({ scale: 0.3 });
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        const renderContext = {
+            canvasContext: context,
+            viewport: viewport
+        };
+
+        await page.render(renderContext).promise;
+
+        // Create thumbnail container
+        const thumbnailDiv = document.createElement('div');
+        thumbnailDiv.className = 'pdf-page-thumbnail';
+        thumbnailDiv.draggable = true;
+        thumbnailDiv.dataset.pageNumber = pageNum;
+
+        // Add page number overlay
+        const pageNumberDiv = document.createElement('div');
+        pageNumberDiv.className = 'page-number';
+        pageNumberDiv.textContent = pageNum;
+
+        // Add delete button
+        const deleteBtn = document.createElement('div');
+        deleteBtn.className = 'delete-page-btn';
+        deleteBtn.innerHTML = '×';
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.deletePage(pageNum);
+        });
+
+        thumbnailDiv.appendChild(canvas);
+        thumbnailDiv.appendChild(pageNumberDiv);
+        thumbnailDiv.appendChild(deleteBtn);
+
+        // Add drag and drop event listeners
+        this.addDragAndDropEvents(thumbnailDiv, pageNum);
+
+        return thumbnailDiv;
+    }
+
+    addDragAndDropEvents(thumbnail, pageNum) {
+        thumbnail.addEventListener('dragstart', (e) => {
+            this.draggedPageIndex = this.pageOrder.indexOf(pageNum);
+            thumbnail.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', thumbnail.outerHTML);
+        });
+
+        thumbnail.addEventListener('dragend', () => {
+            thumbnail.classList.remove('dragging');
+            this.draggedPageIndex = null;
+        });
+
+        thumbnail.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            this.showDropIndicator(thumbnail, e.clientX);
+        });
+
+        thumbnail.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.handlePageDrop(thumbnail, pageNum, e.clientX);
+            this.hideDropIndicators();
+        });
+
+        thumbnail.addEventListener('dragleave', () => {
+            this.hideDropIndicators();
+        });
+
+        // Click to select page (for tools that need page selection)
+        thumbnail.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-page-btn')) return;
+            this.selectPage(pageNum);
+        });
+    }
+
+    showDropIndicator(targetThumbnail, clientX) {
+        this.hideDropIndicators();
+        
+        const rect = targetThumbnail.getBoundingClientRect();
+        const midpoint = rect.left + rect.width / 2;
+        const isRightSide = clientX > midpoint;
+        
+        const indicator = document.createElement('div');
+        indicator.className = `drop-zone-indicator active ${isRightSide ? 'right' : ''}`;
+        targetThumbnail.appendChild(indicator);
+    }
+
+    hideDropIndicators() {
+        document.querySelectorAll('.drop-zone-indicator').forEach(indicator => {
+            indicator.remove();
+        });
+    }
+
+    handlePageDrop(targetThumbnail, targetPageNum, clientX) {
+        if (this.draggedPageIndex === null) return;
+
+        const rect = targetThumbnail.getBoundingClientRect();
+        const midpoint = rect.left + rect.width / 2;
+        const isRightSide = clientX > midpoint;
+        
+        const draggedPageNum = this.pageOrder[this.draggedPageIndex];
+        const targetIndex = this.pageOrder.indexOf(targetPageNum);
+        
+        // Remove dragged page from current position
+        this.pageOrder.splice(this.draggedPageIndex, 1);
+        
+        // Insert at new position
+        const insertIndex = isRightSide ? targetIndex + 1 : targetIndex;
+        this.pageOrder.splice(insertIndex, 0, draggedPageNum);
+        
+        // Re-render thumbnail view
+        this.renderThumbnailView();
+        this.updatePageCountBadge();
+    }
+
+    async deletePage(pageNum) {
+        if (this.pageOrder.filter(p => !this.deletedPages.has(p)).length <= 1) {
+            this.showError('Cannot delete all pages. At least one page must remain.');
+            return;
+        }
+
+        this.deletedPages.add(pageNum);
+        
+        // Update page order to exclude deleted page
+        this.pageOrder = this.pageOrder.filter(p => p !== pageNum);
+        
+        // Re-render thumbnail view
+        await this.renderThumbnailView();
+        this.updatePageCountBadge();
+        
+        // Show success feedback
+        this.showTemporaryMessage(`Page ${pageNum} deleted`, 'success');
+    }
+
+    selectPage(pageNum) {
+        // Remove previous selections
+        document.querySelectorAll('.pdf-page-thumbnail').forEach(thumb => {
+            thumb.classList.remove('border-green-500', 'bg-green-50');
+        });
+        
+        // Highlight selected page
+        const selectedThumbnail = document.querySelector(`[data-page-number="${pageNum}"]`);
+        if (selectedThumbnail) {
+            selectedThumbnail.classList.add('border-green-500', 'bg-green-50');
+        }
+        
+        // Update page input field if visible
+        const pagesInput = document.getElementById('pages');
+        if (pagesInput && !pagesInput.classList.contains('hidden')) {
+            pagesInput.value = pageNum;
+        }
+    }
+
+    toggleViewMode() {
+        this.isThumbviewView = !this.isThumbviewView;
+        
+        const thumbnailView = document.getElementById('thumbnail-view');
+        const singlePageView = document.getElementById('single-page-view');
+        const toggleBtn = document.getElementById('view-mode-toggle');
+        
+        if (this.isThumbviewView) {
+            thumbnailView.classList.remove('hidden');
+            singlePageView.classList.add('hidden');
+            toggleBtn.innerHTML = `
+                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                </svg>
+                Thumbnail View
+            `;
+            this.renderThumbnailView();
+        } else {
+            thumbnailView.classList.add('hidden');
+            singlePageView.classList.remove('hidden');
+            toggleBtn.innerHTML = `
+                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Single Page View
+            `;
+            this.renderPage(this.currentPage);
+            this.updateNavigationButtons();
+            this.updatePageInfo();
         }
     }
 
@@ -320,7 +575,7 @@ class PDFToolApp {
             const ctx = canvas.getContext('2d');
 
             const viewport = page.getViewport({ scale: 1.0 });
-            const scale = Math.min(400 / viewport.width, 500 / viewport.height);
+            const scale = Math.min(600 / viewport.width, 700 / viewport.height);
             const scaledViewport = page.getViewport({ scale });
 
             canvas.width = scaledViewport.width;
@@ -367,6 +622,14 @@ class PDFToolApp {
         const pageInfo = document.getElementById('page-info');
         if (pageInfo) {
             pageInfo.textContent = `Page ${this.currentPage} of ${this.totalPages}`;
+        }
+    }
+
+    updatePageCountBadge() {
+        const badge = document.getElementById('page-count-badge');
+        const activePages = this.pageOrder.filter(p => !this.deletedPages.has(p));
+        if (badge) {
+            badge.textContent = `${activePages.length} pages`;
         }
     }
 
@@ -448,13 +711,14 @@ class PDFToolApp {
         const fileInput = document.getElementById('file-input');
         if (fileInput) fileInput.value = '';
         
-        // Reset selected files
+        // Reset selected files and PDF state
         this.selectedFiles = [];
-        
-        // Reset PDF preview
         this.currentPDF = null;
         this.currentPage = 1;
         this.totalPages = 0;
+        this.pageOrder = [];
+        this.deletedPages.clear();
+        this.isThumbviewView = true;
         
         const pdfPreviewSection = document.getElementById('pdf-preview-section');
         const pdfPreviewPlaceholder = document.getElementById('pdf-preview-placeholder');
@@ -470,6 +734,18 @@ class PDFToolApp {
             formData.append('files', file);
         });
         
+        // Add page reordering information for organize tool
+        if (this.currentTool === 'organize' && this.pageOrder.length > 0) {
+            const activePages = this.pageOrder.filter(p => !this.deletedPages.has(p));
+            formData.append('page_order', activePages.join(','));
+        }
+        
+        // Add deleted pages information for remove-pages tool  
+        if (this.currentTool === 'remove-pages' && this.deletedPages.size > 0) {
+            const pagesToRemove = Array.from(this.deletedPages).join(',');
+            formData.append('pages', pagesToRemove);
+        }
+        
         // Add additional options based on tool
         this.addToolSpecificOptions(formData);
         
@@ -484,7 +760,6 @@ class PDFToolApp {
         switch (this.currentTool) {
             case 'split':
             case 'extract':
-            case 'remove-pages':
                 const pages = document.getElementById('pages')?.value;
                 if (pages) formData.append('pages', pages);
                 break;
@@ -500,10 +775,6 @@ class PDFToolApp {
             case 'watermark':
                 const watermarkText = document.getElementById('watermark-text')?.value;
                 if (watermarkText) formData.append('text', watermarkText);
-                break;
-            case 'organize':
-                const pageOrder = document.getElementById('page-order')?.value;
-                if (pageOrder) formData.append('page_order', pageOrder);
                 break;
             case 'add-page-numbers':
                 const position = document.getElementById('position')?.value;
@@ -647,6 +918,39 @@ class PDFToolApp {
             errorMessage.textContent = message;
             errorArea.classList.remove('hidden');
         }
+    }
+    
+    showTemporaryMessage(message, type = 'info') {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all transform translate-x-full ${
+            type === 'success' ? 'bg-green-100 border border-green-200 text-green-800' :
+            type === 'error' ? 'bg-red-100 border border-red-200 text-red-800' :
+            'bg-blue-100 border border-blue-200 text-blue-800'
+        }`;
+        
+        messageDiv.innerHTML = `
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                ${message}
+            </div>
+        `;
+        
+        document.body.appendChild(messageDiv);
+        
+        // Animate in
+        setTimeout(() => {
+            messageDiv.classList.remove('translate-x-full');
+        }, 100);
+        
+        // Animate out and remove
+        setTimeout(() => {
+            messageDiv.classList.add('translate-x-full');
+            setTimeout(() => {
+                document.body.removeChild(messageDiv);
+            }, 300);
+        }, 3000);
     }
 }
 
