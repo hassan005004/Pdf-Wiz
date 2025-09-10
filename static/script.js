@@ -167,11 +167,11 @@ class PDFToolApp {
         this.currentTool = tool;
         
         // Add tool selection animation
-        const selectedCard = document.querySelector(`[data-tool="${tool}"]`);
-        if (selectedCard && selectedCard.classList.contains('tool-card')) {
-            selectedCard.classList.add('selected');
+        const toolCard = document.querySelector(`[data-tool="${tool}"]`);
+        if (toolCard && toolCard.classList.contains('tool-card')) {
+            toolCard.classList.add('selected');
             setTimeout(() => {
-                selectedCard.classList.remove('selected');
+                toolCard.classList.remove('selected');
             }, 600);
         }
         
@@ -289,10 +289,10 @@ class PDFToolApp {
             card.classList.remove('border-blue-500', 'bg-blue-50');
             card.classList.add('border-gray-200');
         });
-        const selectedCard = document.querySelector(`[data-tool="${tool}"]`);
-        if (selectedCard) {
-            selectedCard.classList.remove('border-gray-200');
-            selectedCard.classList.add('border-blue-500', 'bg-blue-50');
+        const selectedToolCard = document.querySelector(`[data-tool="${tool}"]`);
+        if (selectedToolCard) {
+            selectedToolCard.classList.remove('border-gray-200');
+            selectedToolCard.classList.add('border-blue-500', 'bg-blue-50');
         }
     }
 
