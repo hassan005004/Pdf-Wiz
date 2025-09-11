@@ -1256,6 +1256,296 @@ nav button:hover {
     }
 }
 
+/* Sophisticated Processing Animations */
+.processing-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(99, 102, 241, 0.95));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(20px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.processing-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.processing-content {
+    text-align: center;
+    color: white;
+    max-width: 400px;
+    padding: 2rem;
+}
+
+.processing-spinner {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 2rem;
+    position: relative;
+}
+
+.processing-spinner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid white;
+    border-radius: 50%;
+    animation: processingSpinLarge 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.processing-spinner::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 4px solid white;
+    border-radius: 50%;
+    animation: processingSpinSmall 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite reverse;
+}
+
+@keyframes processingSpinLarge {
+    0% {
+        transform: rotate(0deg) scale(1);
+        border-width: 4px;
+    }
+    50% {
+        transform: rotate(180deg) scale(1.1);
+        border-width: 6px;
+    }
+    100% {
+        transform: rotate(360deg) scale(1);
+        border-width: 4px;
+    }
+}
+
+@keyframes processingSpinSmall {
+    0% {
+        transform: rotate(360deg) scale(0.9);
+        opacity: 0.7;
+    }
+    50% {
+        transform: rotate(180deg) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: rotate(0deg) scale(0.9);
+        opacity: 0.7;
+    }
+}
+
+.processing-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    animation: processingTextPulse 2s ease-in-out infinite;
+}
+
+.processing-subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+    animation: processingSubtitleFade 3s ease-in-out infinite;
+}
+
+@keyframes processingTextPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
+}
+
+@keyframes processingSubtitleFade {
+    0%, 100% {
+        opacity: 0.9;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* File Upload Animations */
+.file-upload-animation {
+    position: relative;
+    overflow: hidden;
+}
+
+.file-upload-animation::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.3), transparent);
+    transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.file-upload-animation.uploading::before {
+    left: 100%;
+}
+
+.file-item-enter {
+    animation: fileItemSlideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fileItemSlideIn {
+    0% {
+        transform: translateX(-100%) rotateY(-90deg);
+        opacity: 0;
+    }
+    50% {
+        transform: translateX(0%) rotateY(-45deg);
+        opacity: 0.7;
+    }
+    100% {
+        transform: translateX(0%) rotateY(0deg);
+        opacity: 1;
+    }
+}
+
+.file-uploading {
+    position: relative;
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    border-color: #22c55e;
+    animation: fileUploadPulse 1.5s ease-in-out infinite;
+}
+
+.file-uploading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.2), transparent);
+    animation: fileUploadSweep 2s ease-in-out infinite;
+}
+
+@keyframes fileUploadPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 20px rgba(34, 197, 94, 0);
+    }
+}
+
+@keyframes fileUploadSweep {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Success Completion Animation */
+.completion-checkmark {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    margin: 2rem auto;
+    position: relative;
+    animation: completionBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.completion-checkmark::before {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+    animation: checkmarkDraw 0.5s ease-out 0.3s both;
+}
+
+@keyframes completionBounce {
+    0% {
+        transform: scale(0) rotate(-180deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.3) rotate(0deg);
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+@keyframes checkmarkDraw {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Enhanced Loading Dots */
+.loading-dots {
+    display: flex;
+    gap: 8px;
+    margin: 1rem 0;
+    justify-content: center;
+}
+
+.loading-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: white;
+    animation: loadingDotBounce 1.4s ease-in-out infinite both;
+}
+
+.loading-dot:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.loading-dot:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+.loading-dot:nth-child(3) {
+    animation-delay: 0;
+}
+
+@keyframes loadingDotBounce {
+    0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+}
+
 /* Enhanced PDF Thumbnail Styles */
 .pdf-page-thumbnail {
     position: relative;

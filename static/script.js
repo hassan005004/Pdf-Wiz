@@ -1,5 +1,6 @@
 /**
- * Enhanced PDF Manipulation Tool Frontend with Interactive Page Management
+ * Enhanced PDF Manipulation Tool Frontend with Interactive Page Management,
+ * Sophisticated Animations, and Sound Effects
  */
 
 // Configure PDF.js worker
@@ -18,188 +19,301 @@ class PDFToolApp {
         this.pageOrder = []; // Track current page order
         this.deletedPages = new Set(); // Track deleted pages
         this.draggedPageIndex = null;
+        this.audioContext = null;
+        this.soundEnabled = true;
+        this.processingMessages = [
+            'Processing your files...',
+            'Applying transformations...',
+            'Optimizing output...',
+            'Almost done...',
+            'Finalizing results...'
+        ];
+        this.messageInterval = null;
         this.init();
     }
 
     init() {
         this.bindEvents();
-        this.createHomeButton();
     }
 
-    createHomeButton() {
-        // Create home button if it doesn't exist
-        if (!document.getElementById('home-button')) {
-            const homeButton = document.createElement('button');
-            homeButton.id = 'home-button';
-            homeButton.className = 'home-button';
-            homeButton.innerHTML = `
-                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-                </svg>
-            `;
-            homeButton.addEventListener('click', this.goHome.bind(this));
-            document.body.appendChild(homeButton);
+    // Initialize Web Audio API for sound effects
+    initAudio() {
+        if (!this.audioContext && this.soundEnabled) {
+            try {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            } catch (e) {
+                console.log('Web Audio API not supported');
+                this.soundEnabled = false;
+            }
         }
     }
-    
-    showHomeButton() {
-        const homeButton = document.getElementById('home-button');
-        if (homeButton) {
+
+    // Generate sophisticated sound effects
+    playSound(type) {
+        if (!this.soundEnabled || !this.audioContext) return;
+        
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        switch (type) {
+            case 'success':
+                // Pleasant completion chime - C-E-G major chord progression
+                this.playChordProgression([523.25, 659.25, 783.99], 0.3, 0.8);
+                break;
+                
+            case 'upload':
+                // Soft upload sound - gentle ascending notes
+                oscillator.frequency.setValueAtTime(440, this.audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(554.37, this.audioContext.currentTime + 0.05);
+                gainNode.gain.setValueAtTime(0.2, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.3);
+                break;
+                
+            case 'error':
+                // Low error tone with slight vibrato
+                oscillator.frequency.setValueAtTime(200, this.audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(180, this.audioContext.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.2, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.4);
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.4);
+                break;
+                
+            case 'click':
+                // Subtle click sound with quick decay
+                oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.08);
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.08);
+                break;
+
+            case 'delete':
+                // Quick swoosh sound for deletions
+                oscillator.frequency.setValueAtTime(400, this.audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(200, this.audioContext.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.15, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.15);
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.15);
+                break;
+        }
+    }
+
+    // Play chord progression for success sounds
+    playChordProgression(frequencies, volume, duration) {
+        frequencies.forEach((freq, index) => {
             setTimeout(() => {
-                homeButton.classList.add('visible');
-            }, 400);
-        }
-    }
-    
-    hideHomeButton() {
-        const homeButton = document.getElementById('home-button');
-        if (homeButton) {
-            homeButton.classList.remove('visible');
-        }
-    }
-    
-    goHome() {
-        const welcomeScreen = document.getElementById('welcome-screen');
-        const toolInterface = document.getElementById('tool-interface');
-        
-        // Add exit animation for tool interface
-        toolInterface.style.opacity = '0';
-        toolInterface.style.transform = 'translateY(20px)';
-        
-        setTimeout(() => {
-            toolInterface.classList.add('hidden');
-            welcomeScreen.classList.remove('hidden');
-            welcomeScreen.style.opacity = '0';
-            welcomeScreen.style.transform = 'translateY(-20px)';
-            
-            setTimeout(() => {
-                welcomeScreen.style.opacity = '1';
-                welcomeScreen.style.transform = 'translateY(0)';
-            }, 50);
-        }, 300);
-        
-        this.hideHomeButton();
-        this.resetInterface();
-        this.currentTool = null;
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime);
+                gainNode.gain.setValueAtTime(volume / frequencies.length, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
+                
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.3);
+            }, index * 100);
+        });
     }
 
     bindEvents() {
-        // Tool selection - updated for grid layout
+        // Initialize audio on first user interaction
+        document.addEventListener('click', () => {
+            this.initAudio();
+        }, { once: true });
+
+        // Tool selection with enhanced animations
         document.querySelectorAll('.tool-card').forEach(card => {
             card.addEventListener('click', (e) => {
                 const tool = e.currentTarget.dataset.tool;
+                this.playSound('click');
+                this.animateCardSelection(card);
                 this.selectTool(tool);
             });
-        });
-
-        // Mega menu tool selection
-        document.querySelectorAll('.mega-menu-item, .mobile-menu-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                const tool = e.currentTarget.dataset.tool;
-                if (tool) {
-                    this.selectTool(tool);
-                    // Close mobile menu if open
-                    const mobileMenu = document.getElementById('mobile-menu');
-                    if (mobileMenu) {
-                        mobileMenu.classList.add('hidden');
-                    }
+            
+            // Enhanced hover effects
+            card.addEventListener('mouseenter', () => {
+                if (!card.classList.contains('border-blue-500')) {
+                    card.style.transform = 'translateY(-4px) scale(1.02)';
+                    card.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                }
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                if (!card.classList.contains('border-blue-500')) {
+                    card.style.transform = '';
                 }
             });
         });
 
-        // Mobile menu toggle
-        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-        const mobileMenu = document.getElementById('mobile-menu');
-        if (mobileMenuToggle && mobileMenu) {
-            mobileMenuToggle.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
-        }
-
-        // Mobile category toggles
-        document.querySelectorAll('.mobile-category-toggle').forEach(toggle => {
-            toggle.addEventListener('click', (e) => {
-                const content = e.currentTarget.nextElementSibling;
-                const icon = e.currentTarget.querySelector('svg:last-child');
-                
-                if (content && content.classList.contains('mobile-category-content')) {
-                    content.classList.toggle('hidden');
-                    icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
-                    e.currentTarget.setAttribute('aria-expanded', !content.classList.contains('hidden'));
-                }
-            });
-        });
-
-        // File upload
+        // File upload with enhanced animations
         const uploadArea = document.getElementById('upload-area');
         const fileInput = document.getElementById('file-input');
 
         if (uploadArea && fileInput) {
-            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('click', () => {
+                this.playSound('click');
+                this.addRippleEffect(uploadArea);
+                fileInput.click();
+            });
             uploadArea.addEventListener('dragover', this.handleDragOver.bind(this));
             uploadArea.addEventListener('drop', this.handleDrop.bind(this));
             uploadArea.addEventListener('dragleave', this.handleDragLeave.bind(this));
             fileInput.addEventListener('change', this.handleFileSelect.bind(this));
         }
 
-        // Process button
+        // Process button with enhanced feedback
         const processBtn = document.getElementById('process-btn');
         if (processBtn) {
-            processBtn.addEventListener('click', this.processFiles.bind(this));
+            processBtn.addEventListener('click', (e) => {
+                this.playSound('click');
+                this.addRippleEffect(e.target);
+                e.target.classList.add('micro-bounce');
+                setTimeout(() => e.target.classList.remove('micro-bounce'), 300);
+                this.processFiles();
+            });
         }
 
-        // View mode toggle
+        // View mode toggle with smooth animation
         const viewModeToggle = document.getElementById('view-mode-toggle');
         if (viewModeToggle) {
-            viewModeToggle.addEventListener('click', this.toggleViewMode.bind(this));
+            viewModeToggle.addEventListener('click', (e) => {
+                this.playSound('click');
+                this.addRippleEffect(e.target);
+                e.target.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    e.target.style.transform = '';
+                    this.toggleViewMode();
+                }, 150);
+            });
         }
 
-        // PDF navigation for single page view
+        // PDF navigation with enhanced feedback
         const prevBtn = document.getElementById('prev-page');
         const nextBtn = document.getElementById('next-page');
         if (prevBtn && nextBtn) {
-            prevBtn.addEventListener('click', () => this.previousPage());
-            nextBtn.addEventListener('click', () => this.nextPage());
+            prevBtn.addEventListener('click', () => {
+                this.playSound('click');
+                this.addRippleEffect(prevBtn);
+                this.previousPage();
+            });
+            nextBtn.addEventListener('click', () => {
+                this.playSound('click');
+                this.addRippleEffect(nextBtn);
+                this.nextPage();
+            });
         }
+    }
+
+    // Add ripple effect to buttons
+    addRippleEffect(element) {
+        const ripple = document.createElement('span');
+        const rect = element.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = rect.width / 2;
+        const y = rect.height / 2;
+
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (x - size / 2) + 'px';
+        ripple.style.top = (y - size / 2) + 'px';
+        ripple.classList.add('ripple');
+
+        const rippleStyle = document.createElement('style');
+        rippleStyle.textContent = `
+            .ripple {
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.6);
+                transform: scale(0);
+                animation: ripple-animation 0.6s linear;
+                pointer-events: none;
+            }
+            @keyframes ripple-animation {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        
+        if (!document.head.querySelector('style[data-ripple]')) {
+            rippleStyle.setAttribute('data-ripple', 'true');
+            document.head.appendChild(rippleStyle);
+        }
+
+        element.style.position = 'relative';
+        element.style.overflow = 'hidden';
+        element.appendChild(ripple);
+
+        setTimeout(() => {
+            if (ripple.parentNode) {
+                ripple.remove();
+            }
+        }, 600);
+    }
+
+    animateCardSelection(card) {
+        // Remove selection from other cards with smooth transition
+        document.querySelectorAll('.tool-card').forEach(c => {
+            c.style.transform = '';
+            c.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            c.classList.remove('border-blue-500', 'bg-blue-50');
+            c.classList.add('border-gray-200');
+        });
+        
+        // Animate selected card with bounce effect
+        card.style.transform = 'scale(1.05)';
+        card.style.transition = 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+        
+        setTimeout(() => {
+            card.style.transform = 'translateY(-2px) scale(1.02)';
+            card.classList.add('border-blue-500', 'bg-blue-50');
+            card.classList.remove('border-gray-200');
+        }, 200);
     }
 
     selectTool(tool) {
         this.currentTool = tool;
-        
-        // Add tool selection animation
-        const toolCard = document.querySelector(`[data-tool="${tool}"]`);
-        if (toolCard && toolCard.classList.contains('tool-card')) {
-            toolCard.classList.add('selected');
-            setTimeout(() => {
-                toolCard.classList.remove('selected');
-            }, 600);
-        }
-        
         this.resetInterface();
         
-        // Show home button with animation
-        this.showHomeButton();
-        
-        // Update UI with smooth transition
+        // Update UI with smooth transitions
         const welcomeScreen = document.getElementById('welcome-screen');
         const toolInterface = document.getElementById('tool-interface');
         
-        welcomeScreen.style.opacity = '0';
-        welcomeScreen.style.transform = 'translateY(-20px)';
-        
-        setTimeout(() => {
-            welcomeScreen.classList.add('hidden');
-            toolInterface.classList.remove('hidden');
-            toolInterface.style.opacity = '0';
-            toolInterface.style.transform = 'translateY(20px)';
+        if (welcomeScreen && toolInterface) {
+            welcomeScreen.style.opacity = '0';
+            welcomeScreen.style.transform = 'scale(0.95)';
             
             setTimeout(() => {
-                toolInterface.style.opacity = '1';
-                toolInterface.style.transform = 'translateY(0)';
-            }, 50);
-        }, 300);
+                welcomeScreen.classList.add('hidden');
+                toolInterface.classList.remove('hidden');
+                toolInterface.style.opacity = '0';
+                toolInterface.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    toolInterface.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                    toolInterface.style.opacity = '1';
+                    toolInterface.style.transform = 'translateY(0)';
+                }, 50);
+            }, 300);
+        }
         
-        // Update title and description
+        // Update titles with typewriter effect
+        this.updateToolInfo(tool);
+        this.showToolOptions(tool);
+        this.updateFileInputSettings(tool);
+    }
+
+    updateToolInfo(tool) {
         const titles = {
             'merge': 'Merge PDF Files',
             'split': 'Split PDF',
@@ -252,47 +366,57 @@ class PDFToolApp {
             'compare': 'Compare two PDFs side by side'
         };
         
-        document.getElementById('tool-title').textContent = titles[tool] || 'PDF Tool';
-        document.getElementById('tool-description').textContent = descriptions[tool] || 'Upload your files to get started';
+        // Animate title change
+        const titleElement = document.getElementById('tool-title');
+        const descElement = document.getElementById('tool-description');
         
-        // Update file input accept attribute
-        const fileInput = document.getElementById('file-input');
-        if (fileInput) {
-            if (tool === 'jpg-to-pdf') {
-                fileInput.accept = '.jpg,.jpeg,.png';
-                fileInput.multiple = true;
-            } else if (tool === 'word-to-pdf') {
-                fileInput.accept = '.docx,.doc';
-                fileInput.multiple = false;
-            } else if (tool === 'excel-to-pdf') {
-                fileInput.accept = '.xlsx,.xls';
-                fileInput.multiple = false;
-            } else if (tool === 'powerpoint-to-pdf') {
-                fileInput.accept = '.pptx,.ppt';
-                fileInput.multiple = false;
-            } else if (tool === 'html-to-pdf') {
-                // HTML to PDF doesn't need file input
-                document.getElementById('upload-area').style.display = 'none';
-                document.getElementById('process-btn').classList.remove('hidden');
-            } else {
-                fileInput.accept = '.pdf';
-                fileInput.multiple = tool === 'merge';
-                document.getElementById('upload-area').style.display = 'block';
-            }
+        if (titleElement && descElement) {
+            this.typewriteText(titleElement, titles[tool] || 'PDF Tool');
+            setTimeout(() => {
+                this.typewriteText(descElement, descriptions[tool] || 'Upload your files to get started');
+            }, 500);
         }
+    }
+
+    typewriteText(element, text) {
+        element.textContent = '';
+        let i = 0;
+        const timer = setInterval(() => {
+            if (i < text.length) {
+                element.textContent += text.charAt(i);
+                i++;
+            } else {
+                clearInterval(timer);
+            }
+        }, 30);
+    }
+
+    updateFileInputSettings(tool) {
+        const fileInput = document.getElementById('file-input');
+        const uploadArea = document.getElementById('upload-area');
         
-        // Show/hide options based on tool
-        this.showToolOptions(tool);
+        if (!fileInput || !uploadArea) return;
         
-        // Highlight selected tool card
-        document.querySelectorAll('.tool-card').forEach(card => {
-            card.classList.remove('border-blue-500', 'bg-blue-50');
-            card.classList.add('border-gray-200');
-        });
-        const selectedToolCard = document.querySelector(`[data-tool="${tool}"]`);
-        if (selectedToolCard) {
-            selectedToolCard.classList.remove('border-gray-200');
-            selectedToolCard.classList.add('border-blue-500', 'bg-blue-50');
+        if (tool === 'jpg-to-pdf') {
+            fileInput.accept = '.jpg,.jpeg,.png,.gif,.bmp,.webp';
+            fileInput.multiple = true;
+        } else if (tool === 'word-to-pdf') {
+            fileInput.accept = '.docx,.doc';
+            fileInput.multiple = false;
+        } else if (tool === 'excel-to-pdf') {
+            fileInput.accept = '.xlsx,.xls';
+            fileInput.multiple = false;
+        } else if (tool === 'powerpoint-to-pdf') {
+            fileInput.accept = '.pptx,.ppt';
+            fileInput.multiple = false;
+        } else if (tool === 'html-to-pdf') {
+            uploadArea.style.display = 'none';
+            const processBtn = document.getElementById('process-btn');
+            if (processBtn) processBtn.classList.remove('hidden');
+        } else {
+            fileInput.accept = '.pdf';
+            fileInput.multiple = tool === 'merge';
+            uploadArea.style.display = 'block';
         }
     }
 
@@ -306,47 +430,56 @@ class PDFToolApp {
         
         optionSections.forEach(id => {
             const element = document.getElementById(id);
-            if (element) element.classList.add('hidden');
+            if (element) {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(-10px)';
+                setTimeout(() => element.classList.add('hidden'), 200);
+            }
         });
         
         const optionsArea = document.getElementById('options-area');
         if (optionsArea) optionsArea.classList.add('hidden');
         
-        // Show relevant options based on tool
+        // Show relevant options with animation
+        let sectionToShow = null;
         switch (tool) {
             case 'split':
             case 'extract':
             case 'remove-pages':
-                this.showOptionSection('pages-input');
+                sectionToShow = 'pages-input';
                 break;
             case 'rotate':
-                this.showOptionSection('angle-input');
+                sectionToShow = 'angle-input';
                 break;
             case 'protect':
             case 'unlock':
-                this.showOptionSection('password-input');
+                sectionToShow = 'password-input';
                 break;
             case 'watermark':
-                this.showOptionSection('watermark-input');
+                sectionToShow = 'watermark-input';
                 break;
             case 'organize':
-                this.showOptionSection('page-order-input');
+                sectionToShow = 'page-order-input';
                 break;
             case 'add-page-numbers':
-                this.showOptionSection('position-input');
+                sectionToShow = 'position-input';
                 break;
             case 'ocr':
-                this.showOptionSection('language-input');
+                sectionToShow = 'language-input';
                 break;
             case 'html-to-pdf':
-                this.showOptionSection('html-input');
+                sectionToShow = 'html-input';
                 break;
             case 'crop':
-                this.showOptionSection('crop-input');
+                sectionToShow = 'crop-input';
                 break;
             case 'compare':
-                this.showOptionSection('second-file-input');
+                sectionToShow = 'second-file-input';
                 break;
+        }
+
+        if (sectionToShow) {
+            setTimeout(() => this.showOptionSection(sectionToShow), 300);
         }
     }
     
@@ -356,13 +489,27 @@ class PDFToolApp {
         if (optionsArea && section) {
             optionsArea.classList.remove('hidden');
             section.classList.remove('hidden');
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                section.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                section.style.opacity = '1';
+                section.style.transform = 'translateY(0)';
+            }, 100);
         }
     }
 
     async handleFileSelect(e) {
         const files = Array.from(e.target.files);
         this.selectedFiles = files;
-        this.displaySelectedFiles();
+        
+        // Play upload sound and show animation
+        this.playSound('upload');
+        this.showUploadAnimation();
+        
+        // Animate file display
+        await this.displaySelectedFilesAnimated();
         
         // Show PDF preview for the first PDF file
         const firstPDF = files.find(file => file.type === 'application/pdf');
@@ -370,9 +517,57 @@ class PDFToolApp {
             await this.displayPDFPreview(firstPDF);
         }
         
-        // Show process button if files are selected
+        // Show process button with animation if files are selected
         if (files.length > 0) {
-            document.getElementById('process-btn').classList.remove('hidden');
+            this.showProcessButtonAnimated();
+        }
+    }
+
+    showProcessButtonAnimated() {
+        const processBtn = document.getElementById('process-btn');
+        if (processBtn) {
+            processBtn.classList.remove('hidden');
+            processBtn.style.opacity = '0';
+            processBtn.style.transform = 'translateY(30px) scale(0.9)';
+            
+            setTimeout(() => {
+                processBtn.style.transition = 'all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                processBtn.style.opacity = '1';
+                processBtn.style.transform = 'translateY(0) scale(1)';
+            }, 200);
+        }
+    }
+
+    showUploadAnimation() {
+        const uploadArea = document.getElementById('upload-area');
+        if (uploadArea) {
+            uploadArea.classList.add('file-upload-animation', 'uploading');
+            
+            // Create particles effect
+            this.createParticleEffect(uploadArea);
+            
+            setTimeout(() => {
+                uploadArea.classList.remove('uploading');
+            }, 800);
+        }
+    }
+
+    createParticleEffect(container) {
+        const particleCount = 8;
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 2 + 's';
+            particle.style.animationDuration = (3 + Math.random() * 2) + 's';
+            
+            container.appendChild(particle);
+            
+            setTimeout(() => {
+                if (particle.parentNode) {
+                    particle.remove();
+                }
+            }, 5000);
         }
     }
     
@@ -387,18 +582,33 @@ class PDFToolApp {
         
         const files = Array.from(e.dataTransfer.files);
         this.selectedFiles = files;
-        this.displaySelectedFiles();
         
-        // Show PDF preview for the first PDF file
+        // Enhanced drop animation
+        this.playSound('upload');
+        this.showDropAnimation(uploadArea);
+        
+        await this.displaySelectedFilesAnimated();
+        
         const firstPDF = files.find(file => file.type === 'application/pdf');
         if (firstPDF && typeof pdfjsLib !== 'undefined') {
             await this.displayPDFPreview(firstPDF);
         }
         
-        // Show process button if files are selected
         if (files.length > 0) {
-            document.getElementById('process-btn').classList.remove('hidden');
+            this.showProcessButtonAnimated();
         }
+    }
+
+    showDropAnimation(uploadArea) {
+        if (!uploadArea) return;
+        
+        uploadArea.style.transform = 'scale(1.05)';
+        uploadArea.style.transition = 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+        
+        setTimeout(() => {
+            uploadArea.style.transform = 'scale(1)';
+            this.createParticleEffect(uploadArea);
+        }, 200);
     }
     
     handleDragOver(e) {
@@ -408,6 +618,7 @@ class PDFToolApp {
         const uploadArea = document.getElementById('upload-area');
         if (uploadArea) {
             uploadArea.classList.add('border-blue-500', 'bg-blue-50');
+            uploadArea.style.transform = 'scale(1.02)';
         }
     }
 
@@ -418,6 +629,7 @@ class PDFToolApp {
         const uploadArea = document.getElementById('upload-area');
         if (uploadArea) {
             uploadArea.classList.remove('border-blue-500', 'bg-blue-50');
+            uploadArea.style.transform = '';
         }
     }
 
@@ -427,6 +639,9 @@ class PDFToolApp {
         }
 
         try {
+            // Show loading animation
+            this.showPDFLoadingAnimation();
+            
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
             this.currentPDF = pdf;
@@ -437,11 +652,32 @@ class PDFToolApp {
             this.pageOrder = Array.from({length: this.totalPages}, (_, i) => i + 1);
             this.deletedPages.clear();
 
-            document.getElementById('pdf-preview-section').classList.remove('hidden');
-            document.getElementById('pdf-preview-placeholder').classList.add('hidden');
+            // Animate preview appearance
+            const previewSection = document.getElementById('pdf-preview-section');
+            const previewPlaceholder = document.getElementById('pdf-preview-placeholder');
+            
+            if (previewPlaceholder) {
+                previewPlaceholder.style.opacity = '0';
+                previewPlaceholder.style.transform = 'scale(0.95)';
+                setTimeout(() => previewPlaceholder.classList.add('hidden'), 300);
+            }
 
-            // Update page count badge
-            this.updatePageCountBadge();
+            setTimeout(() => {
+                if (previewSection) {
+                    previewSection.classList.remove('hidden');
+                    previewSection.style.opacity = '0';
+                    previewSection.style.transform = 'translateY(20px)';
+                    
+                    setTimeout(() => {
+                        previewSection.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                        previewSection.style.opacity = '1';
+                        previewSection.style.transform = 'translateY(0)';
+                    }, 100);
+                }
+            }, 300);
+
+            // Update page count badge with animation
+            this.updatePageCountBadgeAnimated();
 
             // Show thumbnail view by default
             if (this.isThumbviewView) {
@@ -451,9 +687,30 @@ class PDFToolApp {
                 this.updateNavigationButtons();
                 this.updatePageInfo();
             }
+            
+            this.playSound('success');
         } catch (error) {
             console.error('Error loading PDF:', error);
+            this.playSound('error');
             this.showError('Failed to load PDF preview');
+        }
+    }
+
+    showPDFLoadingAnimation() {
+        const placeholder = document.getElementById('pdf-preview-placeholder');
+        if (placeholder) {
+            const originalContent = placeholder.innerHTML;
+            placeholder.innerHTML = `
+                <div class="text-center py-12">
+                    <div class="processing-spinner mx-auto mb-4" style="width: 60px; height: 60px;"></div>
+                    <h4 class="text-lg font-semibold text-gray-700 mb-2">Loading PDF Preview</h4>
+                    <div class="loading-dots">
+                        <div class="loading-dot" style="background: #6366f1;"></div>
+                        <div class="loading-dot" style="background: #6366f1;"></div>
+                        <div class="loading-dot" style="background: #6366f1;"></div>
+                    </div>
+                </div>
+            `;
         }
     }
 
@@ -465,15 +722,16 @@ class PDFToolApp {
         
         if (!pagesGrid) return;
 
-        // Show loading state
+        // Show loading state with animated placeholders
         pagesGrid.innerHTML = '';
         for (let i = 0; i < this.totalPages; i++) {
             const loadingDiv = document.createElement('div');
             loadingDiv.className = 'thumbnail-loading';
+            loadingDiv.style.animationDelay = (i * 0.1) + 's';
             pagesGrid.appendChild(loadingDiv);
         }
 
-        emptyState.classList.add('hidden');
+        if (emptyState) emptyState.classList.add('hidden');
 
         // Render all pages as thumbnails
         const thumbnails = [];
@@ -489,19 +747,27 @@ class PDFToolApp {
             }
         }
 
-        // Clear loading state and add thumbnails
+        // Clear loading state and add thumbnails with staggered animation
         pagesGrid.innerHTML = '';
-        thumbnails.forEach(thumbnail => {
+        thumbnails.forEach((thumbnail, index) => {
+            thumbnail.style.opacity = '0';
+            thumbnail.style.transform = 'translateY(20px) scale(0.8)';
             pagesGrid.appendChild(thumbnail);
+            
+            setTimeout(() => {
+                thumbnail.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                thumbnail.style.opacity = '1';
+                thumbnail.style.transform = 'translateY(0) scale(1)';
+            }, index * 100);
         });
 
-        if (thumbnails.length === 0) {
+        if (thumbnails.length === 0 && emptyState) {
             emptyState.classList.remove('hidden');
         }
     }
 
     async createPageThumbnail(page, pageNum) {
-        const viewport = page.getViewport({ scale: 0.3 });
+        const viewport = page.getViewport({ scale: 0.4 });
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
         canvas.width = viewport.width;
@@ -514,7 +780,7 @@ class PDFToolApp {
 
         await page.render(renderContext).promise;
 
-        // Create thumbnail container
+        // Create thumbnail container with enhanced styling
         const thumbnailDiv = document.createElement('div');
         thumbnailDiv.className = 'pdf-page-thumbnail';
         thumbnailDiv.draggable = true;
@@ -548,6 +814,7 @@ class PDFToolApp {
         thumbnail.addEventListener('dragstart', (e) => {
             this.draggedPageIndex = this.pageOrder.indexOf(pageNum);
             thumbnail.classList.add('dragging');
+            this.playSound('click');
             e.dataTransfer.effectAllowed = 'move';
             e.dataTransfer.setData('text/html', thumbnail.outerHTML);
         });
@@ -555,6 +822,7 @@ class PDFToolApp {
         thumbnail.addEventListener('dragend', () => {
             thumbnail.classList.remove('dragging');
             this.draggedPageIndex = null;
+            this.hideDropIndicators();
         });
 
         thumbnail.addEventListener('dragover', (e) => {
@@ -573,10 +841,24 @@ class PDFToolApp {
             this.hideDropIndicators();
         });
 
-        // Click to select page (for tools that need page selection)
+        // Enhanced click interactions
         thumbnail.addEventListener('click', (e) => {
             if (e.target.classList.contains('delete-page-btn')) return;
+            this.playSound('click');
             this.selectPage(pageNum);
+        });
+
+        // Enhanced hover effects
+        thumbnail.addEventListener('mouseenter', () => {
+            if (!thumbnail.classList.contains('dragging')) {
+                thumbnail.style.zIndex = '10';
+            }
+        });
+
+        thumbnail.addEventListener('mouseleave', () => {
+            if (!thumbnail.classList.contains('dragging')) {
+                thumbnail.style.zIndex = '';
+            }
         });
     }
 
@@ -594,7 +876,12 @@ class PDFToolApp {
 
     hideDropIndicators() {
         document.querySelectorAll('.drop-zone-indicator').forEach(indicator => {
-            indicator.remove();
+            indicator.style.opacity = '0';
+            setTimeout(() => {
+                if (indicator.parentNode) {
+                    indicator.remove();
+                }
+            }, 300);
         });
     }
 
@@ -608,22 +895,44 @@ class PDFToolApp {
         const draggedPageNum = this.pageOrder[this.draggedPageIndex];
         const targetIndex = this.pageOrder.indexOf(targetPageNum);
         
+        if (draggedPageNum === targetPageNum) return;
+        
+        // Play success sound for reordering
+        this.playSound('success');
+        
         // Remove dragged page from current position
         this.pageOrder.splice(this.draggedPageIndex, 1);
         
         // Insert at new position
-        const insertIndex = isRightSide ? targetIndex + 1 : targetIndex;
-        this.pageOrder.splice(insertIndex, 0, draggedPageNum);
+        const insertIndex = isRightSide ? targetIndex : targetIndex - 1;
+        this.pageOrder.splice(Math.max(0, insertIndex), 0, draggedPageNum);
         
-        // Re-render thumbnail view
-        this.renderThumbnailView();
-        this.updatePageCountBadge();
+        // Show visual feedback
+        this.showTemporaryMessage(`Page ${draggedPageNum} moved to position ${insertIndex + 1}`, 'success');
+        
+        // Re-render thumbnail view with smooth transition
+        setTimeout(() => {
+            this.renderThumbnailView();
+            this.updatePageCountBadgeAnimated();
+        }, 200);
     }
 
     async deletePage(pageNum) {
         if (this.pageOrder.filter(p => !this.deletedPages.has(p)).length <= 1) {
+            this.playSound('error');
             this.showError('Cannot delete all pages. At least one page must remain.');
             return;
+        }
+
+        // Play delete sound and animate deletion
+        this.playSound('delete');
+        
+        // Find and animate the thumbnail being deleted
+        const thumbnail = document.querySelector(`[data-page-number="${pageNum}"]`);
+        if (thumbnail) {
+            thumbnail.style.transform = 'scale(0) rotate(180deg)';
+            thumbnail.style.opacity = '0';
+            thumbnail.style.filter = 'blur(5px)';
         }
 
         this.deletedPages.add(pageNum);
@@ -631,24 +940,31 @@ class PDFToolApp {
         // Update page order to exclude deleted page
         this.pageOrder = this.pageOrder.filter(p => p !== pageNum);
         
-        // Re-render thumbnail view
-        await this.renderThumbnailView();
-        this.updatePageCountBadge();
+        // Re-render thumbnail view with delay for animation
+        setTimeout(async () => {
+            await this.renderThumbnailView();
+            this.updatePageCountBadgeAnimated();
+        }, 400);
         
         // Show success feedback
-        this.showTemporaryMessage(`Page ${pageNum} deleted`, 'success');
+        this.showTemporaryMessage(`Page ${pageNum} deleted successfully`, 'success');
     }
 
     selectPage(pageNum) {
-        // Remove previous selections
+        // Remove previous selections with smooth transition
         document.querySelectorAll('.pdf-page-thumbnail').forEach(thumb => {
+            thumb.style.transition = 'all 0.3s ease';
             thumb.classList.remove('border-green-500', 'bg-green-50');
         });
         
-        // Highlight selected page
+        // Highlight selected page with pulse effect
         const selectedThumbnail = document.querySelector(`[data-page-number="${pageNum}"]`);
         if (selectedThumbnail) {
             selectedThumbnail.classList.add('border-green-500', 'bg-green-50');
+            selectedThumbnail.style.animation = 'pulse 0.5s ease-in-out';
+            setTimeout(() => {
+                selectedThumbnail.style.animation = '';
+            }, 500);
         }
         
         // Update page input field if visible
@@ -665,9 +981,30 @@ class PDFToolApp {
         const singlePageView = document.getElementById('single-page-view');
         const toggleBtn = document.getElementById('view-mode-toggle');
         
+        if (!thumbnailView || !singlePageView || !toggleBtn) return;
+        
+        // Animate transition between views
+        const currentView = this.isThumbviewView ? singlePageView : thumbnailView;
+        const nextView = this.isThumbviewView ? thumbnailView : singlePageView;
+        
+        currentView.style.opacity = '0';
+        currentView.style.transform = 'translateY(-20px)';
+        
+        setTimeout(() => {
+            currentView.classList.add('hidden');
+            nextView.classList.remove('hidden');
+            nextView.style.opacity = '0';
+            nextView.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                nextView.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                nextView.style.opacity = '1';
+                nextView.style.transform = 'translateY(0)';
+            }, 50);
+        }, 300);
+        
+        // Update toggle button with animation
         if (this.isThumbviewView) {
-            thumbnailView.classList.remove('hidden');
-            singlePageView.classList.add('hidden');
             toggleBtn.innerHTML = `
                 <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
@@ -676,8 +1013,6 @@ class PDFToolApp {
             `;
             this.renderThumbnailView();
         } else {
-            thumbnailView.classList.add('hidden');
-            singlePageView.classList.remove('hidden');
             toggleBtn.innerHTML = `
                 <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -696,6 +1031,8 @@ class PDFToolApp {
         try {
             const page = await this.currentPDF.getPage(pageNum);
             const canvas = document.getElementById('pdf-canvas');
+            if (!canvas) return;
+            
             const ctx = canvas.getContext('2d');
 
             const viewport = page.getViewport({ scale: 1.0 });
@@ -705,12 +1042,21 @@ class PDFToolApp {
             canvas.width = scaledViewport.width;
             canvas.height = scaledViewport.height;
 
+            // Add loading animation to canvas
+            canvas.style.opacity = '0.5';
+            canvas.style.filter = 'blur(2px)';
+
             const renderContext = {
                 canvasContext: ctx,
                 viewport: scaledViewport
             };
 
             await page.render(renderContext).promise;
+            
+            // Animate canvas appearance
+            canvas.style.transition = 'all 0.3s ease';
+            canvas.style.opacity = '1';
+            canvas.style.filter = 'none';
         } catch (error) {
             console.error('Error rendering page:', error);
         }
@@ -738,8 +1084,14 @@ class PDFToolApp {
         const prevBtn = document.getElementById('prev-page');
         const nextBtn = document.getElementById('next-page');
         
-        if (prevBtn) prevBtn.disabled = this.currentPage <= 1;
-        if (nextBtn) nextBtn.disabled = this.currentPage >= this.totalPages;
+        if (prevBtn) {
+            prevBtn.disabled = this.currentPage <= 1;
+            prevBtn.classList.toggle('opacity-50', this.currentPage <= 1);
+        }
+        if (nextBtn) {
+            nextBtn.disabled = this.currentPage >= this.totalPages;
+            nextBtn.classList.toggle('opacity-50', this.currentPage >= this.totalPages);
+        }
     }
 
     updatePageInfo() {
@@ -749,15 +1101,28 @@ class PDFToolApp {
         }
     }
 
-    updatePageCountBadge() {
+    updatePageCountBadgeAnimated() {
         const badge = document.getElementById('page-count-badge');
         const activePages = this.pageOrder.filter(p => !this.deletedPages.has(p));
+        
         if (badge) {
-            badge.textContent = `${activePages.length} pages`;
+            // Animate count change
+            badge.style.transform = 'scale(1.2)';
+            badge.style.transition = 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            
+            setTimeout(() => {
+                badge.textContent = `${activePages.length} pages`;
+                badge.style.transform = 'scale(1)';
+            }, 150);
         }
     }
 
-    displaySelectedFiles() {
+    updatePageCountBadge() {
+        // Fallback to non-animated version
+        this.updatePageCountBadgeAnimated();
+    }
+
+    async displaySelectedFilesAnimated() {
         const selectedFilesDiv = document.getElementById('selected-files');
         const fileListDiv = document.getElementById('file-list');
         
@@ -771,41 +1136,104 @@ class PDFToolApp {
         selectedFilesDiv.classList.remove('hidden');
         fileListDiv.innerHTML = '';
         
-        this.selectedFiles.forEach((file, index) => {
-            const fileDiv = document.createElement('div');
-            fileDiv.className = 'bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-between';
-            
-            const fileSize = this.formatFileSize(file.size);
-            
-            fileDiv.innerHTML = `
-                <div class="flex items-center">
-                    <svg class="w-8 h-8 text-gray-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v10H4V5z"/>
-                    </svg>
-                    <div>
-                        <p class="text-sm font-medium text-gray-900">${file.name}</p>
-                        <p class="text-xs text-gray-500">${fileSize}</p>
-                    </div>
-                </div>
-                <button class="text-red-500 hover:text-red-700" onclick="app.removeFile(${index})">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                    </svg>
-                </button>
-            `;
-            
-            fileListDiv.appendChild(fileDiv);
-        });
+        // Animate files appearing one by one
+        for (let [index, file] of this.selectedFiles.entries()) {
+            await new Promise(resolve => {
+                setTimeout(() => {
+                    const fileDiv = document.createElement('div');
+                    fileDiv.className = 'bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-between file-item-enter file-uploading';
+                    
+                    const fileSize = this.formatFileSize(file.size);
+                    const fileIcon = this.getFileIcon(file.type);
+                    
+                    fileDiv.innerHTML = `
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 mr-3 flex items-center justify-center rounded-lg ${this.getFileIconBg(file.type)}">
+                                ${fileIcon}
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">${file.name}</p>
+                                <p class="text-xs text-gray-500">${fileSize}</p>
+                            </div>
+                        </div>
+                        <button class="text-red-500 hover:text-red-700 transition-all hover:scale-110 p-1 rounded-full hover:bg-red-50" onclick="app.removeFile(${index})">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    `;
+                    
+                    fileListDiv.appendChild(fileDiv);
+                    
+                    // Remove upload animation after it completes
+                    setTimeout(() => {
+                        fileDiv.classList.remove('file-uploading');
+                    }, 1500);
+                    
+                    resolve();
+                }, index * 150); // Stagger animation
+            });
+        }
+    }
+
+    getFileIcon(mimeType) {
+        if (mimeType === 'application/pdf') {
+            return '<svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24"><path d="M7 18h10v-1H7v1zM7 17h10v-1H7v1zm5-9V3l4 4h-4z"></path></svg>';
+        }
+        if (mimeType.startsWith('image/')) {
+            return '<svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"></path></svg>';
+        }
+        if (mimeType.includes('word')) {
+            return '<svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"></path></svg>';
+        }
+        return '<svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16c0 1.1.89 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"></path></svg>';
+    }
+
+    getFileIconBg(mimeType) {
+        if (mimeType === 'application/pdf') return 'bg-red-100';
+        if (mimeType.startsWith('image/')) return 'bg-green-100';
+        if (mimeType.includes('word')) return 'bg-blue-100';
+        return 'bg-gray-100';
     }
     
+    displaySelectedFiles() {
+        // Fallback to non-animated version
+        this.displaySelectedFilesAnimated();
+    }
+
     removeFile(index) {
-        this.selectedFiles.splice(index, 1);
-        this.displaySelectedFiles();
+        // Play click sound
+        this.playSound('click');
         
-        if (this.selectedFiles.length === 0) {
-            document.getElementById('process-btn').classList.add('hidden');
-            document.getElementById('pdf-preview-section').classList.add('hidden');
-            document.getElementById('pdf-preview-placeholder').classList.remove('hidden');
+        // Animate file removal
+        const fileList = document.getElementById('file-list');
+        if (!fileList) return;
+        
+        const fileItems = fileList.children;
+        if (fileItems[index]) {
+            const fileItem = fileItems[index];
+            fileItem.style.transform = 'translateX(100%) scale(0.8)';
+            fileItem.style.opacity = '0';
+            fileItem.style.filter = 'blur(3px)';
+            
+            setTimeout(() => {
+                this.selectedFiles.splice(index, 1);
+                this.displaySelectedFiles();
+                
+                if (this.selectedFiles.length === 0) {
+                    const processBtn = document.getElementById('process-btn');
+                    if (processBtn) {
+                        processBtn.style.transform = 'translateY(20px) scale(0.9)';
+                        processBtn.style.opacity = '0';
+                        setTimeout(() => processBtn.classList.add('hidden'), 200);
+                    }
+                    
+                    const previewSection = document.getElementById('pdf-preview-section');
+                    const previewPlaceholder = document.getElementById('pdf-preview-placeholder');
+                    if (previewSection) previewSection.classList.add('hidden');
+                    if (previewPlaceholder) previewPlaceholder.classList.remove('hidden');
+                }
+            }, 400);
         }
     }
 
@@ -818,21 +1246,24 @@ class PDFToolApp {
     }
     
     resetInterface() {
-        // Reset all interface elements
+        // Reset with smooth animations
         const elementsToHide = [
             'selected-files', 'options-area', 'progress-area', 'results-area', 'error-area'
         ];
         
         elementsToHide.forEach(id => {
             const element = document.getElementById(id);
-            if (element) element.classList.add('hidden');
+            if (element && !element.classList.contains('hidden')) {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(-10px)';
+                setTimeout(() => element.classList.add('hidden'), 200);
+            }
         });
         
         const processBtn = document.getElementById('process-btn');
-        if (processBtn) {
-            processBtn.classList.add('hidden');
-            processBtn.classList.remove('processing');
-            processBtn.disabled = false;
+        if (processBtn && !processBtn.classList.contains('hidden')) {
+            processBtn.style.opacity = '0';
+            setTimeout(() => processBtn.classList.add('hidden'), 200);
         }
         
         // Reset file input
@@ -848,35 +1279,18 @@ class PDFToolApp {
         this.deletedPages.clear();
         this.isThumbviewView = true;
         
-        // Remove processing animations from all tool cards
-        document.querySelectorAll('.tool-card').forEach(card => {
-            card.classList.remove('processing', 'selected');
-        });
-        
         const pdfPreviewSection = document.getElementById('pdf-preview-section');
         const pdfPreviewPlaceholder = document.getElementById('pdf-preview-placeholder');
-        if (pdfPreviewSection) pdfPreviewSection.classList.add('hidden');
-        if (pdfPreviewPlaceholder) pdfPreviewPlaceholder.classList.remove('hidden');
+        if (pdfPreviewSection) {
+            pdfPreviewSection.style.opacity = '0';
+            setTimeout(() => pdfPreviewSection.classList.add('hidden'), 200);
+        }
+        if (pdfPreviewPlaceholder) {
+            setTimeout(() => pdfPreviewPlaceholder.classList.remove('hidden'), 300);
+        }
     }
 
     processFiles() {
-        // Add processing animation to button
-        const processBtn = document.getElementById('process-btn');
-        if (processBtn) {
-            processBtn.classList.add('processing');
-            processBtn.disabled = true;
-            const originalText = processBtn.innerHTML;
-            processBtn.innerHTML = `
-                <span style="opacity: 0;">Processing...</span>
-            `;
-        }
-        
-        // Add processing animation to selected tool card
-        const selectedCard = document.querySelector(`[data-tool="${this.currentTool}"]`);
-        if (selectedCard && selectedCard.classList.contains('tool-card')) {
-            selectedCard.classList.add('processing');
-        }
-        
         const formData = new FormData();
         
         // Add files to form data
@@ -899,7 +1313,7 @@ class PDFToolApp {
         // Add additional options based on tool
         this.addToolSpecificOptions(formData);
         
-        // Show progress
+        // Show enhanced progress animation
         this.showProgress();
         
         // Send request
@@ -952,15 +1366,86 @@ class PDFToolApp {
     }
     
     showProgress() {
-        document.getElementById('progress-area').classList.remove('hidden');
-        document.getElementById('error-area').classList.add('hidden');
-        document.getElementById('results-area').classList.add('hidden');
+        // Show enhanced processing overlay
+        const overlay = document.getElementById('processing-overlay');
+        if (overlay) {
+            overlay.classList.add('active');
+            
+            // Add particles to overlay
+            setTimeout(() => {
+                this.createParticleEffect(overlay);
+            }, 500);
+        }
+        
+        // Cycle through processing messages
+        this.cycleProcessingMessages();
+        
+        const progressArea = document.getElementById('progress-area');
+        if (progressArea) progressArea.classList.remove('hidden');
+        
+        const errorArea = document.getElementById('error-area');
+        if (errorArea) errorArea.classList.add('hidden');
+        
+        const resultsArea = document.getElementById('results-area');
+        if (resultsArea) resultsArea.classList.add('hidden');
         
         const progressBar = document.getElementById('progress-bar');
         const progressText = document.getElementById('progress-text');
         
-        if (progressBar) progressBar.style.width = '10%';
+        if (progressBar) {
+            progressBar.style.width = '10%';
+            progressBar.classList.add('enhanced-progress-bar');
+        }
         if (progressText) progressText.textContent = 'Processing your files...';
+    }
+    
+    cycleProcessingMessages() {
+        let messageIndex = 0;
+        const processingText = document.getElementById('processing-text');
+        const processingSubtitle = document.getElementById('processing-subtitle');
+        
+        this.messageInterval = setInterval(() => {
+            if (processingText && processingSubtitle) {
+                messageIndex = (messageIndex + 1) % this.processingMessages.length;
+                processingText.style.opacity = '0';
+                processingText.style.transform = 'translateY(-10px)';
+                
+                setTimeout(() => {
+                    processingText.textContent = this.processingMessages[messageIndex];
+                    processingText.style.opacity = '1';
+                    processingText.style.transform = 'translateY(0)';
+                }, 300);
+                
+                // Update subtitle with helpful tips
+                const subtitles = [
+                    'Please wait while we work our magic...',
+                    'Your files are being optimized...',
+                    'Almost there, hang tight...',
+                    'Putting the finishing touches...',
+                    'Just a few more seconds...'
+                ];
+                
+                setTimeout(() => {
+                    processingSubtitle.style.opacity = '0';
+                    setTimeout(() => {
+                        processingSubtitle.textContent = subtitles[messageIndex] || subtitles[0];
+                        processingSubtitle.style.opacity = '1';
+                    }, 150);
+                }, 150);
+            }
+        }, 2500);
+    }
+    
+    hideProgress() {
+        const overlay = document.getElementById('processing-overlay');
+        if (overlay) {
+            overlay.classList.remove('active');
+        }
+        
+        if (this.messageInterval) {
+            clearInterval(this.messageInterval);
+            this.messageInterval = null;
+        }
     }
     
     async sendProcessingRequest(formData) {
@@ -973,22 +1458,49 @@ class PDFToolApp {
             });
             
             const progressBar = document.getElementById('progress-bar');
-            if (progressBar) progressBar.style.width = '50%';
+            if (progressBar) {
+                progressBar.style.width = '70%';
+                progressBar.classList.add('enhanced-progress-bar');
+            }
             
             if (response.ok) {
                 const result = await response.json();
                 if (progressBar) progressBar.style.width = '100%';
+                
+                // Show completion animation
+                await this.showCompletionAnimation();
+                this.playSound('success');
                 this.showResults(result);
             } else {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
         } catch (error) {
             console.error('Processing error:', error);
+            this.playSound('error');
             this.showError(`Processing failed: ${error.message}`);
         } finally {
-            this.cleanupProcessingAnimations();
-            document.getElementById('progress-area').classList.add('hidden');
+            this.hideProgress();
+            const progressArea = document.getElementById('progress-area');
+            if (progressArea) progressArea.classList.add('hidden');
         }
+    }
+    
+    async showCompletionAnimation() {
+        return new Promise(resolve => {
+            const overlay = document.getElementById('processing-overlay');
+            const content = overlay?.querySelector('.processing-content');
+            
+            if (content) {
+                // Replace spinner with checkmark
+                content.innerHTML = `
+                    <div class="completion-checkmark"></div>
+                    <h3 class="processing-text">Success!</h3>
+                    <p class="processing-subtitle">Your files have been processed successfully</p>
+                `;
+            }
+            
+            setTimeout(resolve, 1200);
+        });
     }
     
     getAPIEndpoint() {
@@ -1026,87 +1538,120 @@ class PDFToolApp {
         
         if (!resultsArea || !downloadLinks) return;
         
+        // Animate results appearance
         resultsArea.classList.remove('hidden');
+        resultsArea.style.opacity = '0';
+        resultsArea.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            resultsArea.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+            resultsArea.style.opacity = '1';
+            resultsArea.style.transform = 'translateY(0)';
+        }, 100);
+        
         downloadLinks.innerHTML = '';
         
         if (result.output_file) {
-            this.createDownloadLink(result.output_file, downloadLinks);
+            this.createDownloadLink(result.output_file, downloadLinks, 0);
         } else if (result.output_files) {
-            result.output_files.forEach(file => {
-                this.createDownloadLink(file, downloadLinks);
+            result.output_files.forEach((file, index) => {
+                this.createDownloadLink(file, downloadLinks, index);
             });
         }
     }
     
-    createDownloadLink(filePath, container) {
+    createDownloadLink(filePath, container, index = 0) {
         const fileName = filePath.split('/').pop();
         const linkDiv = document.createElement('div');
-        linkDiv.className = 'bg-green-50 border border-green-200 rounded-lg p-4 flex items-center justify-between';
+        linkDiv.className = 'bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-all transform hover:-translate-y-1';
+        linkDiv.style.opacity = '0';
+        linkDiv.style.transform = 'translateY(20px)';
         
         linkDiv.innerHTML = `
             <div class="flex items-center">
-                <svg class="w-6 h-6 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
+                <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mr-4">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
                 <div>
-                    <p class="text-sm font-medium text-gray-900">${fileName}</p>
-                    <p class="text-xs text-gray-500">Ready to download</p>
+                    <p class="text-sm font-semibold text-gray-900">${fileName}</p>
+                    <p class="text-xs text-green-600">Ready to download</p>
                 </div>
             </div>
-            <a href="/api/download/${filePath}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors" download>
+            <a href="/api/download/${filePath}" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-105 hover:shadow-lg flex items-center" download>
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
                 Download
             </a>
         `;
         
         container.appendChild(linkDiv);
+        
+        // Animate appearance with delay
+        setTimeout(() => {
+            linkDiv.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+            linkDiv.style.opacity = '1';
+            linkDiv.style.transform = 'translateY(0)';
+        }, index * 150 + 200);
     }
     
     showError(message) {
+        this.hideProgress();
+        
         const errorArea = document.getElementById('error-area');
         const errorMessage = document.getElementById('error-message');
         
         if (errorArea && errorMessage) {
+            // Add shake animation to error
+            errorArea.classList.add('micro-shake');
+            setTimeout(() => errorArea.classList.remove('micro-shake'), 600);
+            
             errorMessage.textContent = message;
             errorArea.classList.remove('hidden');
-        }
-    }
-    
-    cleanupProcessingAnimations() {
-        // Remove processing animation from button
-        const processBtn = document.getElementById('process-btn');
-        if (processBtn) {
-            processBtn.classList.remove('processing');
-            processBtn.disabled = false;
-            processBtn.innerHTML = `
-                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-                Process Files
-            `;
+            errorArea.style.opacity = '0';
+            setTimeout(() => {
+                errorArea.style.transition = 'all 0.3s ease';
+                errorArea.style.opacity = '1';
+            }, 100);
         }
         
-        // Remove processing animation from tool card
-        const selectedCard = document.querySelector(`[data-tool="${this.currentTool}"]`);
-        if (selectedCard && selectedCard.classList.contains('tool-card')) {
-            selectedCard.classList.remove('processing');
-        }
+        // Show temporary error notification
+        this.showTemporaryMessage(message, 'error');
     }
     
     showTemporaryMessage(message, type = 'info') {
         const messageDiv = document.createElement('div');
-        messageDiv.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all transform translate-x-full ${
-            type === 'success' ? 'bg-green-100 border border-green-200 text-green-800' :
-            type === 'error' ? 'bg-red-100 border border-red-200 text-red-800' :
-            'bg-blue-100 border border-blue-200 text-blue-800'
+        messageDiv.className = `fixed top-4 right-4 z-50 p-4 rounded-xl shadow-2xl transition-all transform translate-x-full notification-enter glass-card backdrop-blur-xl ${
+            type === 'success' ? 'bg-gradient-to-r from-green-100 to-emerald-100 border border-green-300 text-green-800' :
+            type === 'error' ? 'bg-gradient-to-r from-red-100 to-rose-100 border border-red-300 text-red-800' :
+            'bg-gradient-to-r from-blue-100 to-indigo-100 border border-blue-300 text-blue-800'
         }`;
+        
+        const icons = {
+            success: '✓',
+            error: '✕',
+            info: 'ℹ'
+        };
         
         messageDiv.innerHTML = `
             <div class="flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                </svg>
-                ${message}
+                <div class="w-8 h-8 mr-3 flex items-center justify-center rounded-full font-bold text-white ${
+                    type === 'success' ? 'bg-green-500' :
+                    type === 'error' ? 'bg-red-500' :
+                    'bg-blue-500'
+                } shadow-lg">
+                    ${icons[type] || icons.info}
+                </div>
+                <div class="flex-1">
+                    <p class="font-medium">${message}</p>
+                </div>
+                <button class="ml-3 w-6 h-6 flex items-center justify-center rounded-full hover:bg-white hover:bg-opacity-20 transition-colors" onclick="this.parentElement.parentElement.remove()">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
             </div>
         `;
         
@@ -1117,15 +1662,50 @@ class PDFToolApp {
             messageDiv.classList.remove('translate-x-full');
         }, 100);
         
-        // Animate out and remove
+        // Auto-remove after delay
         setTimeout(() => {
-            messageDiv.classList.add('translate-x-full');
+            messageDiv.classList.add('notification-exit');
             setTimeout(() => {
-                document.body.removeChild(messageDiv);
+                if (messageDiv.parentNode) {
+                    document.body.removeChild(messageDiv);
+                }
             }, 300);
-        }, 3000);
+        }, 4000);
     }
 }
 
-// Initialize the app
-const app = new PDFToolApp();
+// Initialize the app with comprehensive error handling
+try {
+    const app = new PDFToolApp();
+    
+    // Global error handler for better UX
+    window.addEventListener('error', (event) => {
+        console.error('Global error:', event.error);
+        if (app.showTemporaryMessage) {
+            app.showTemporaryMessage('An unexpected error occurred. Please try again.', 'error');
+        }
+    });
+    
+    // Handle unhandled promise rejections
+    window.addEventListener('unhandledrejection', (event) => {
+        console.error('Unhandled promise rejection:', event.reason);
+        if (app.showTemporaryMessage) {
+            app.showTemporaryMessage('A processing error occurred. Please try again.', 'error');
+        }
+    });
+    
+    // Make app globally available
+    window.app = app;
+    
+    console.log('PDF Tool App initialized successfully with enhanced animations and sound effects!');
+} catch (error) {
+    console.error('Failed to initialize PDF Tool App:', error);
+    document.body.innerHTML = `
+        <div class="min-h-screen flex items-center justify-center bg-red-50">
+            <div class="text-center">
+                <h1 class="text-2xl font-bold text-red-600 mb-4">Application Error</h1>
+                <p class="text-red-500">Failed to initialize PDF Tool. Please refresh the page and try again.</p>
+            </div>
+        </div>
+    `;
+}
