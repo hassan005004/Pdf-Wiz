@@ -160,9 +160,9 @@ class PDFToolApp {
         const fileInput = document.getElementById('file-input');
 
         if (uploadArea && fileInput) {
-            uploadArea.addEventListener('click', () => {
+            uploadArea.addEventListener('click', (e) => {
                 this.playSound('click');
-                this.addRippleEffect(uploadArea);
+                this.addRippleEffect(uploadArea, e);
                 fileInput.click();
             });
             uploadArea.addEventListener('dragover', this.handleDragOver.bind(this));
@@ -176,7 +176,7 @@ class PDFToolApp {
         if (processBtn) {
             processBtn.addEventListener('click', (e) => {
                 this.playSound('click');
-                this.addRippleEffect(e.target);
+                this.addRippleEffect(e.target, e);
                 e.target.classList.add('micro-bounce');
                 setTimeout(() => e.target.classList.remove('micro-bounce'), 300);
                 this.processFiles();
@@ -188,7 +188,7 @@ class PDFToolApp {
         if (viewModeToggle) {
             viewModeToggle.addEventListener('click', (e) => {
                 this.playSound('click');
-                this.addRippleEffect(e.target);
+                this.addRippleEffect(e.target, e);
                 e.target.style.transform = 'scale(0.95)';
                 setTimeout(() => {
                     e.target.style.transform = '';
@@ -215,40 +215,24 @@ class PDFToolApp {
     }
 
     // Add ripple effect to buttons
-    addRippleEffect(element) {
+    addRippleEffect(element, event = null) {
         const ripple = document.createElement('span');
         const rect = element.getBoundingClientRect();
         const size = Math.max(rect.width, rect.height);
-        const x = rect.width / 2;
-        const y = rect.height / 2;
+        
+        let x, y;
+        if (event) {
+            x = event.clientX - rect.left;
+            y = event.clientY - rect.top;
+        } else {
+            x = rect.width / 2;
+            y = rect.height / 2;
+        }
 
         ripple.style.width = ripple.style.height = size + 'px';
         ripple.style.left = (x - size / 2) + 'px';
         ripple.style.top = (y - size / 2) + 'px';
         ripple.classList.add('ripple');
-
-        const rippleStyle = document.createElement('style');
-        rippleStyle.textContent = `
-            .ripple {
-                position: absolute;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.6);
-                transform: scale(0);
-                animation: ripple-animation 0.6s linear;
-                pointer-events: none;
-            }
-            @keyframes ripple-animation {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-        `;
-        
-        if (!document.head.querySelector('style[data-ripple]')) {
-            rippleStyle.setAttribute('data-ripple', 'true');
-            document.head.appendChild(rippleStyle);
-        }
 
         element.style.position = 'relative';
         element.style.overflow = 'hidden';
@@ -259,6 +243,32 @@ class PDFToolApp {
                 ripple.remove();
             }
         }, 600);
+    }
+
+    // Create enhanced particle effects
+    createParticleEffect(container, options = {}) {
+        const particleCount = options.count || 12;
+        const colors = options.colors || ['#3b82f6', '#6366f1', '#8b5cf6', '#06b6d4'];
+        
+        for (let i = 0; i < particleCount; i++) {
+            setTimeout(() => {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = (Math.random() * 100) + '%';
+                particle.style.top = (Math.random() * 100) + '%';
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.animationDelay = (Math.random() * 0.5) + 's';
+                particle.style.animationDuration = (2 + Math.random() * 2) + 's';
+                
+                container.appendChild(particle);
+                
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.remove();
+                    }
+                }, 4000);
+            }, i * 100);
+        }
     }
 
     animateCardSelection(card) {
@@ -1394,7 +1404,9 @@ class PDFToolApp {
         
         if (progressBar) {
             progressBar.style.width = '10%';
-            progressBar.classList.add('enhanced-progress-bar');
+            progressBar.classList.add('shimmer');
+            progressBar.style.position = 'relative';
+            progressBar.style.overflow = 'hidden';
         }
         if (progressText) progressText.textContent = 'Processing your files...';
     }
@@ -1460,7 +1472,7 @@ class PDFToolApp {
             const progressBar = document.getElementById('progress-bar');
             if (progressBar) {
                 progressBar.style.width = '70%';
-                progressBar.classList.add('enhanced-progress-bar');
+                progressBar.classList.add('shimmer');
             }
             
             if (response.ok) {
