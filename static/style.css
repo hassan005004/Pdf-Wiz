@@ -64,7 +64,7 @@ body {
         left: 0;
         top: 0;
     }
-    
+
     .main-content {
         margin-left: 320px;
     }
@@ -74,7 +74,7 @@ body {
     .sidebar {
         width: 360px;
     }
-    
+
     .main-content {
         margin-left: 360px;
     }
@@ -244,7 +244,7 @@ body {
         font-size: 0.8rem;
         padding: 0.625rem 1.25rem;
     }
-    
+
     .btn-lg {
         padding: 0.875rem 1.75rem;
         font-size: 0.9rem;
@@ -605,7 +605,7 @@ body {
         padding: 0.875rem 1rem;
         font-size: 0.9rem;
     }
-    
+
     .home-button {
         width: 50px;
         height: 50px;
@@ -613,7 +613,7 @@ body {
         top: 15px;
         left: 15px;
     }
-    
+
     .tool-card:hover {
         transform: translateY(-4px) scale(1.01);
     }
@@ -694,7 +694,7 @@ body {
     .space-y-4 > * + * {
         margin-top: 0.75rem;
     }
-    
+
     .space-y-6 > * + * {
         margin-top: 1rem;
     }
@@ -795,7 +795,7 @@ body {
         min-height: 44px;
         min-width: 44px;
     }
-    
+
     .tap-highlight {
         -webkit-tap-highlight-color: rgba(59, 130, 246, 0.1);
     }
@@ -816,24 +816,24 @@ body {
     .w-64 {
         width: 100%;
     }
-    
+
     .fixed {
         position: relative;
     }
-    
+
     .h-screen {
         height: auto;
         min-height: 50vh;
     }
-    
+
     .p-8 {
         padding: 1.5rem;
     }
-    
+
     .text-xl {
         font-size: 1.125rem;
     }
-    
+
     .text-3xl {
         font-size: 1.875rem;
     }
@@ -1023,8 +1023,8 @@ body {
 
 .mega-menu-item:hover {
     background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-    transform: translateX(4px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transform: translateX(8px) scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .mega-menu-item svg {
@@ -1097,15 +1097,15 @@ nav .absolute {
     .mega-menu-item {
         padding: 10px;
     }
-    
+
     .mega-menu-item svg {
         margin-right: 8px;
     }
-    
+
     .mobile-category-content {
         animation: slideDown 0.3s ease-out;
     }
-    
+
     @keyframes slideDown {
         from {
             opacity: 0;
@@ -1245,21 +1245,21 @@ nav button:hover {
     .visual-interface {
         padding: 1rem;
     }
-    
+
     .preview-panels {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
-    
+
     .file-item {
         padding: 0.75rem;
     }
-    
+
     .target-item {
         padding: 0.75rem;
         margin-bottom: 0.5rem;
     }
-    
+
     .action-btn {
         padding: 0.75rem 1rem;
         font-size: 0.875rem;
@@ -1272,12 +1272,12 @@ nav button:hover {
         min-height: 60px;
         touch-action: manipulation;
     }
-    
+
     .drag-handle {
         padding: 0.5rem;
         margin: -0.5rem;
     }
-    
+
     .preview-btn {
         padding: 0.5rem;
         margin: -0.5rem;
@@ -1308,12 +1308,12 @@ nav button:hover {
         border-width: 2px;
         border-color: #000;
     }
-    
+
     .target-item {
         border-width: 2px;
         border-color: #22c55e;
     }
-    
+
     .drop-zone.drag-over {
         border-width: 3px;
     }
@@ -1328,7 +1328,7 @@ nav button:hover {
         transition: none;
         animation: none;
     }
-    
+
     .file-item:hover,
     .action-btn:hover {
         transform: none;
@@ -2069,20 +2069,20 @@ nav button:hover {
     .pdf-page-thumbnail {
         border-radius: 8px;
     }
-    
+
     .page-number {
         font-size: 10px;
         padding: 3px 6px;
         border-radius: 8px;
     }
-    
+
     .delete-page-btn {
         width: 24px;
         height: 24px;
         top: 6px;
         right: 6px;
     }
-    
+
     .pages-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
@@ -2094,7 +2094,7 @@ nav button:hover {
         grid-template-columns: 1fr;
         gap: 16px;
     }
-    
+
     .pdf-page-thumbnail {
         max-width: 280px;
         margin: 0 auto;
@@ -2107,12 +2107,12 @@ nav button:hover {
         background: #1f2937;
         border-color: #374151;
     }
-    
+
     .page-number {
         background: linear-gradient(135deg, #1f2937, #111827);
         border-color: #374151;
     }
-    
+
     .info-box {
         background: linear-gradient(135deg, #1f2937, rgba(59, 130, 246, 0.1));
         border-color: rgba(59, 130, 246, 0.2);
@@ -2125,11 +2125,11 @@ nav button:hover {
         border-width: 3px;
         border-color: #000;
     }
-    
+
     .delete-page-btn {
         border: 2px solid #fff;
     }
-    
+
     .page-number {
         border: 1px solid #000;
     }
@@ -2144,12 +2144,12 @@ nav button:hover {
         transition: none;
         animation: none;
     }
-    
+
     .pdf-page-thumbnail:hover,
     .pdf-page-thumbnail:active {
         transform: none;
     }
-    
+
     .thumbnail-loading {
         animation: none;
         background: #f0f0f0;

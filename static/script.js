@@ -49,16 +49,25 @@ class PDFToolApp {
     
     showWelcomeScreen() {
         // Hide all tool interfaces
-        document.getElementById('welcome-screen').style.display = 'block';
+        const welcomeScreen = document.getElementById('welcome-screen');
         const toolInterface = document.getElementById('tool-interface');
-        if (toolInterface) {
+        
+        if (welcomeScreen && toolInterface) {
+            welcomeScreen.style.display = 'block';
             toolInterface.style.display = 'none';
+            toolInterface.classList.add('hidden');
+            welcomeScreen.classList.remove('hidden');
         }
         
         // Reset active states
         document.querySelectorAll('.tool-card').forEach(card => {
-            card.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-50');
+            card.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-50', 'border-blue-500');
+            card.classList.add('border-gray-200');
+            card.style.transform = '';
         });
+        
+        // Reset current tool
+        this.currentTool = null;
         
         this.playSound('click');
     }
