@@ -53,10 +53,13 @@ class PDFToolApp {
         const toolInterface = document.getElementById('tool-interface');
         
         if (welcomeScreen && toolInterface) {
+            // Show welcome screen
             welcomeScreen.style.display = 'block';
+            welcomeScreen.classList.remove('hidden');
+            
+            // Hide tool interface
             toolInterface.style.display = 'none';
             toolInterface.classList.add('hidden');
-            welcomeScreen.classList.remove('hidden');
         }
         
         // Reset active states
@@ -68,6 +71,9 @@ class PDFToolApp {
         
         // Reset current tool
         this.currentTool = null;
+        
+        // Reset interface
+        this.resetInterface();
         
         this.playSound('click');
     }
@@ -176,6 +182,12 @@ class PDFToolApp {
                 const tool = e.currentTarget.dataset.tool;
                 if (tool) {
                     this.playSound('click');
+                    
+                    // Close mobile menu if open
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
                     
                     // Find corresponding tool card for animation
                     const toolCard = document.querySelector(`.tool-card[data-tool="${tool}"]`);
@@ -378,11 +390,16 @@ class PDFToolApp {
         const toolInterface = document.getElementById('tool-interface');
         
         if (welcomeScreen && toolInterface) {
+            // Hide welcome screen
             welcomeScreen.style.opacity = '0';
             welcomeScreen.style.transform = 'scale(0.95)';
             
             setTimeout(() => {
+                welcomeScreen.style.display = 'none';
                 welcomeScreen.classList.add('hidden');
+                
+                // Show tool interface
+                toolInterface.style.display = 'block';
                 toolInterface.classList.remove('hidden');
                 toolInterface.style.opacity = '0';
                 toolInterface.style.transform = 'translateY(20px)';
