@@ -158,16 +158,29 @@ class PDFToolApp {
             this.initAudio();
         }, { once: true });
 
-        // Tool selection with enhanced animations
-        document.querySelectorAll('.tool-card').forEach(card => {
-            card.addEventListener('click', (e) => {
+        // Tool selection with enhanced animations - both from cards and mega menu
+        document.querySelectorAll('.tool-card, .mega-menu-item, .mobile-menu-item').forEach(element => {
+            element.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
                 const tool = e.currentTarget.dataset.tool;
-                this.playSound('click');
-                this.animateCardSelection(card);
-                this.selectTool(tool);
+                if (tool) {
+                    this.playSound('click');
+                    
+                    // Find corresponding tool card for animation
+                    const toolCard = document.querySelector(`.tool-card[data-tool="${tool}"]`);
+                    if (toolCard) {
+                        this.animateCardSelection(toolCard);
+                    }
+                    
+                    this.selectTool(tool);
+                }
             });
-            
-            // Enhanced hover effects
+        });
+        
+        // Enhanced hover effects for tool cards
+        document.querySelectorAll('.tool-card').forEach(card => {
             card.addEventListener('mouseenter', () => {
                 if (!card.classList.contains('border-blue-500')) {
                     card.style.transform = 'translateY(-4px) scale(1.02)';
@@ -178,6 +191,35 @@ class PDFToolApp {
             card.addEventListener('mouseleave', () => {
                 if (!card.classList.contains('border-blue-500')) {
                     card.style.transform = '';
+                }
+            });
+        });
+
+        // Mobile menu toggle functionality
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuToggle && mobileMenu) {
+            mobileMenuToggle.addEventListener('click', () => {
+                this.playSound('click');
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        // Mobile category toggles
+        document.querySelectorAll('.mobile-category-toggle').forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.playSound('click');
+                
+                const content = toggle.nextElementSibling;
+                const arrow = toggle.querySelector('svg:last-child');
+                
+                if (content && content.classList.contains('mobile-category-content')) {
+                    content.classList.toggle('hidden');
+                    if (arrow) {
+                        arrow.style.transform = content.classList.contains('hidden') ? '' : 'rotate(180deg)';
+                    }
                 }
             });
         });
