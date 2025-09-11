@@ -30,6 +30,14 @@
             <!-- Mega Menu Navigation -->
             <nav class="hidden md:block border-t border-gray-100 pt-4 pb-2">
                 <div class="flex items-center space-x-8">
+                    <!-- Home Button -->
+                    <button id="home-btn" class="flex items-center px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-all">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        Home
+                    </button>
+                    
                     <!-- Create/Convert Category -->
                     <div class="relative group">
                         <button class="flex items-center px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-all">
@@ -497,18 +505,41 @@
         <!-- Welcome Screen -->
         <div id="welcome-screen">
             <div class="text-center mb-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">Choose a PDF Tool</h2>
-                <p class="text-gray-600">Select from our comprehensive collection of PDF processing tools</p>
+                <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    <h2 class="text-4xl font-bold mb-4">Choose a PDF Tool</h2>
+                </div>
+                <p class="text-lg text-gray-700 max-w-2xl mx-auto">Select from our comprehensive collection of professional PDF processing tools designed to handle all your document needs with speed and precision</p>
+                <div class="mt-6 flex justify-center space-x-4">
+                    <div class="flex items-center text-sm text-gray-600">
+                        <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        25+ Professional Tools
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <svg class="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732L14.146 12.8l-1.179 4.456a1 1 0 01-1.934 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732L9.854 7.2l1.179-4.456A1 1 0 0112 2z" clip-rule="evenodd"/>
+                        </svg>
+                        Fast & Secure
+                    </div>
+                    <div class="flex items-center text-sm text-gray-600">
+                        <svg class="w-5 h-5 text-purple-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        No Registration Required
+                    </div>
+                </div>
             </div>
             
             <!-- Tools Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                 <!-- Merge PDF -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="merge">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="merge">
                     <div class="text-center">
-                        <div class="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                            <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/>
+                        <div class="w-18 h-18 bg-gradient-to-br from-red-400 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                            <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                                <path d="M12,14H14L15,17H13L12,14M12,10H14V13H12V10Z" fill="currentColor" opacity="0.7"/>
                             </svg>
                         </div>
                         <h3 class="text-lg font-medium text-gray-900 mb-2">Merge PDF</h3>
@@ -517,7 +548,7 @@
                 </div>
 
                 <!-- Split PDF -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="split">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="split">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
@@ -530,7 +561,7 @@
                 </div>
 
                 <!-- Compress PDF -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="compress">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="compress">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
@@ -543,7 +574,7 @@
                 </div>
 
                 <!-- PDF to Word -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="pdf-to-word">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="pdf-to-word">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
@@ -556,7 +587,7 @@
                 </div>
 
                 <!-- Word to PDF -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="word-to-pdf">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="word-to-pdf">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
@@ -569,7 +600,7 @@
                 </div>
 
                 <!-- Excel to PDF -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="excel-to-pdf">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="excel-to-pdf">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
@@ -582,7 +613,7 @@
                 </div>
 
                 <!-- PowerPoint to PDF -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="powerpoint-to-pdf">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="powerpoint-to-pdf">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
@@ -595,7 +626,7 @@
                 </div>
 
                 <!-- JPG to PDF -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="jpg-to-pdf">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="jpg-to-pdf">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
@@ -608,7 +639,7 @@
                 </div>
 
                 <!-- PDF to JPG -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="pdf-to-jpg">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="pdf-to-jpg">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
@@ -621,7 +652,7 @@
                 </div>
 
                 <!-- Rotate PDF -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="rotate">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="rotate">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
@@ -634,7 +665,7 @@
                 </div>
 
                 <!-- Unlock PDF -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="unlock">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="unlock">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
@@ -647,7 +678,7 @@
                 </div>
 
                 <!-- Protect PDF -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="protect">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="protect">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
@@ -660,7 +691,7 @@
                 </div>
 
                 <!-- Watermark -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="watermark">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="watermark">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
@@ -673,7 +704,7 @@
                 </div>
 
                 <!-- Extract Pages -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="extract">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="extract">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
@@ -686,7 +717,7 @@
                 </div>
 
                 <!-- Page Numbers -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="add-page-numbers">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="add-page-numbers">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
@@ -699,7 +730,7 @@
                 </div>
 
                 <!-- Organize PDF -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="organize">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="organize">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
@@ -712,7 +743,7 @@
                 </div>
 
                 <!-- Remove Pages -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="remove-pages">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="remove-pages">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
@@ -725,7 +756,7 @@
                 </div>
 
                 <!-- Optimize PDF -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="optimize">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="optimize">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
@@ -738,7 +769,7 @@
                 </div>
 
                 <!-- OCR PDF -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="ocr">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="ocr">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-indigo-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
@@ -751,7 +782,7 @@
                 </div>
 
                 <!-- HTML to PDF -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="html-to-pdf">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="html-to-pdf">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
@@ -764,7 +795,7 @@
                 </div>
 
                 <!-- Repair PDF -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="repair">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="repair">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
@@ -777,7 +808,7 @@
                 </div>
 
                 <!-- Crop PDF -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="crop">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="crop">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
@@ -790,7 +821,7 @@
                 </div>
 
                 <!-- Compare PDFs -->
-                <div class="tool-card bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all cursor-pointer border-2 border-gray-200 hover:border-blue-300" data-tool="compare">
+                <div class="tool-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-gray-200 hover:border-blue-400 hover:scale-105" data-tool="compare">
                     <div class="text-center">
                         <div class="w-16 h-16 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                             <svg class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 20 20">

@@ -51,7 +51,7 @@ async def merge_pdfs(files: List[UploadFile] = File(...)):
         # Save uploaded files
         temp_files = []
         for file in files:
-            if not file.filename.lower().endswith('.pdf'):
+            if not file.filename or not file.filename.lower().endswith('.pdf'):
                 raise HTTPException(status_code=400, detail=f"File {file.filename} is not a PDF")
             
             temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
@@ -76,7 +76,7 @@ async def merge_pdfs(files: List[UploadFile] = File(...)):
 async def split_pdf(file: UploadFile = File(...), pages: str = Form(...)):
     """Split PDF into separate pages or page ranges"""
     try:
-        if not file.filename.lower().endswith('.pdf'):
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -111,7 +111,7 @@ async def split_pdf(file: UploadFile = File(...), pages: str = Form(...)):
 async def extract_pages(file: UploadFile = File(...), pages: str = Form(...)):
     """Extract specific pages from PDF"""
     try:
-        if not file.filename.lower().endswith('.pdf'):
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -140,7 +140,7 @@ async def extract_pages(file: UploadFile = File(...), pages: str = Form(...)):
 async def rotate_pdf(file: UploadFile = File(...), angle: int = Form(...)):
     """Rotate PDF pages"""
     try:
-        if not file.filename.lower().endswith('.pdf'):
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         if angle not in [90, 180, 270]:
@@ -167,7 +167,7 @@ async def rotate_pdf(file: UploadFile = File(...), angle: int = Form(...)):
 async def compress_pdf(file: UploadFile = File(...)):
     """Compress PDF file"""
     try:
-        if not file.filename.lower().endswith('.pdf'):
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -191,7 +191,7 @@ async def compress_pdf(file: UploadFile = File(...)):
 async def protect_pdf(file: UploadFile = File(...), password: str = Form(...)):
     """Add password protection to PDF"""
     try:
-        if not file.filename.lower().endswith('.pdf'):
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         if not password:
@@ -218,7 +218,7 @@ async def protect_pdf(file: UploadFile = File(...), password: str = Form(...)):
 async def unlock_pdf(file: UploadFile = File(...), password: str = Form(...)):
     """Remove password protection from PDF"""
     try:
-        if not file.filename.lower().endswith('.pdf'):
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -270,7 +270,7 @@ async def jpg_to_pdf(files: List[UploadFile] = File(...)):
 async def pdf_to_jpg(file: UploadFile = File(...)):
     """Convert PDF to JPG images"""
     try:
-        if not file.filename.lower().endswith('.pdf'):
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -293,7 +293,7 @@ async def pdf_to_jpg(file: UploadFile = File(...)):
 async def add_watermark(file: UploadFile = File(...), text: str = Form(...)):
     """Add watermark to PDF"""
     try:
-        if not file.filename.lower().endswith('.pdf'):
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         if not text:
@@ -339,7 +339,7 @@ async def download_file(file_path: str):
 async def organize_pdf(file: UploadFile = File(...), page_order: str = Form(...)):
     """Reorder pages in PDF"""
     try:
-        if not file.filename.lower().endswith('.pdf'):
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -366,7 +366,7 @@ async def organize_pdf(file: UploadFile = File(...), page_order: str = Form(...)
 async def remove_pages(file: UploadFile = File(...), pages: str = Form(...)):
     """Remove specific pages from PDF"""
     try:
-        if not file.filename.lower().endswith('.pdf'):
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -393,7 +393,7 @@ async def remove_pages(file: UploadFile = File(...), pages: str = Form(...)):
 async def optimize_pdf(file: UploadFile = File(...)):
     """Optimize PDF for smaller size"""
     try:
-        if not file.filename.lower().endswith('.pdf'):
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -417,7 +417,7 @@ async def optimize_pdf(file: UploadFile = File(...)):
 async def repair_pdf(file: UploadFile = File(...)):
     """Repair corrupted PDF"""
     try:
-        if not file.filename.lower().endswith('.pdf'):
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -441,7 +441,7 @@ async def repair_pdf(file: UploadFile = File(...)):
 async def ocr_pdf(file: UploadFile = File(...), language: str = Form("eng")):
     """Perform OCR on PDF to make it searchable"""
     try:
-        if not file.filename.lower().endswith('.pdf'):
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -465,7 +465,7 @@ async def ocr_pdf(file: UploadFile = File(...), language: str = Form("eng")):
 async def add_page_numbers(file: UploadFile = File(...), position: str = Form("bottom-right")):
     """Add page numbers to PDF"""
     try:
-        if not file.filename.lower().endswith('.pdf'):
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -489,7 +489,7 @@ async def add_page_numbers(file: UploadFile = File(...), position: str = Form("b
 async def crop_pdf(file: UploadFile = File(...), left: float = Form(...), bottom: float = Form(...), right: float = Form(...), top: float = Form(...)):
     """Crop PDF pages"""
     try:
-        if not file.filename.lower().endswith('.pdf'):
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -601,7 +601,7 @@ async def html_to_pdf(html_content: str = Form(...)):
 async def pdf_to_pdfa(file: UploadFile = File(...)):
     """Convert PDF to PDF/A format"""
     try:
-        if not file.filename.lower().endswith('.pdf'):
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -627,7 +627,7 @@ async def pdf_to_pdfa(file: UploadFile = File(...)):
 async def sign_pdf(file: UploadFile = File(...), signature: str = Form(...)):
     """Add digital signature to PDF"""
     try:
-        if not file.filename.lower().endswith('.pdf'):
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -651,7 +651,7 @@ async def sign_pdf(file: UploadFile = File(...), signature: str = Form(...)):
 async def redact_pdf(file: UploadFile = File(...), areas: str = Form(...)):
     """Redact sensitive information from PDF"""
     try:
-        if not file.filename.lower().endswith('.pdf'):
+        if not file.filename or not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file

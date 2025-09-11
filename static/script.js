@@ -34,6 +34,33 @@ class PDFToolApp {
 
     init() {
         this.bindEvents();
+        this.initHomeButton();
+    }
+    
+    // Home button functionality
+    initHomeButton() {
+        const homeBtn = document.getElementById('home-btn');
+        if (homeBtn) {
+            homeBtn.addEventListener('click', () => {
+                this.showWelcomeScreen();
+            });
+        }
+    }
+    
+    showWelcomeScreen() {
+        // Hide all tool interfaces
+        document.getElementById('welcome-screen').style.display = 'block';
+        const toolInterface = document.getElementById('tool-interface');
+        if (toolInterface) {
+            toolInterface.style.display = 'none';
+        }
+        
+        // Reset active states
+        document.querySelectorAll('.tool-card').forEach(card => {
+            card.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-50');
+        });
+        
+        this.playSound('click');
     }
 
     // Initialize Web Audio API for sound effects
