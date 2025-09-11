@@ -54,7 +54,8 @@ async def merge_pdfs(files: List[UploadFile] = File(...)):
             if not file.filename or not file.filename.lower().endswith('.pdf'):
                 raise HTTPException(status_code=400, detail=f"File {file.filename} is not a PDF")
             
-            temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+            safe_filename = os.path.basename(file.filename)
+            temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
             with open(temp_path, "wb") as buffer:
                 shutil.copyfileobj(file.file, buffer)
             temp_files.append(temp_path)
@@ -80,7 +81,8 @@ async def split_pdf(file: UploadFile = File(...), pages: str = Form(...)):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -115,7 +117,8 @@ async def extract_pages(file: UploadFile = File(...), pages: str = Form(...)):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -147,7 +150,8 @@ async def rotate_pdf(file: UploadFile = File(...), angle: int = Form(...)):
             raise HTTPException(status_code=400, detail="Angle must be 90, 180, or 270")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -171,7 +175,8 @@ async def compress_pdf(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -198,7 +203,8 @@ async def protect_pdf(file: UploadFile = File(...), password: str = Form(...)):
             raise HTTPException(status_code=400, detail="Password is required")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -222,7 +228,8 @@ async def unlock_pdf(file: UploadFile = File(...), password: str = Form(...)):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -248,7 +255,8 @@ async def jpg_to_pdf(files: List[UploadFile] = File(...)):
             if not file.filename.lower().endswith(('.jpg', '.jpeg', '.png')):
                 raise HTTPException(status_code=400, detail=f"File {file.filename} is not a valid image")
             
-            temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+            safe_filename = os.path.basename(file.filename)
+            temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
             with open(temp_path, "wb") as buffer:
                 shutil.copyfileobj(file.file, buffer)
             temp_files.append(temp_path)
@@ -274,7 +282,8 @@ async def pdf_to_jpg(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -300,7 +309,8 @@ async def add_watermark(file: UploadFile = File(...), text: str = Form(...)):
             raise HTTPException(status_code=400, detail="Watermark text is required")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -343,7 +353,8 @@ async def organize_pdf(file: UploadFile = File(...), page_order: str = Form(...)
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -370,7 +381,8 @@ async def remove_pages(file: UploadFile = File(...), pages: str = Form(...)):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -397,7 +409,8 @@ async def optimize_pdf(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -421,7 +434,8 @@ async def repair_pdf(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -445,7 +459,8 @@ async def ocr_pdf(file: UploadFile = File(...), language: str = Form("eng")):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -469,7 +484,8 @@ async def add_page_numbers(file: UploadFile = File(...), position: str = Form("b
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -493,7 +509,8 @@ async def crop_pdf(file: UploadFile = File(...), left: float = Form(...), bottom
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -520,7 +537,8 @@ async def word_to_pdf(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail="File must be a Word document")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -544,7 +562,8 @@ async def excel_to_pdf(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail="File must be an Excel file")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -568,7 +587,8 @@ async def powerpoint_to_pdf(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail="File must be a PowerPoint file")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -605,7 +625,8 @@ async def pdf_to_pdfa(file: UploadFile = File(...)):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -631,7 +652,8 @@ async def sign_pdf(file: UploadFile = File(...), signature: str = Form(...)):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
@@ -655,7 +677,8 @@ async def redact_pdf(file: UploadFile = File(...), areas: str = Form(...)):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
-        temp_path = f"uploads/{uuid.uuid4()}_{file.filename}"
+        safe_filename = os.path.basename(file.filename)
+        temp_path = os.path.join("uploads", f"{uuid.uuid4()}_{safe_filename}")
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
