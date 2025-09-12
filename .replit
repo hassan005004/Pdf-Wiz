@@ -7,7 +7,7 @@ channel = "stable-25_05"
 packages = ["fontconfig", "freetype", "ghostscript", "glib", "glibcLocales", "harfbuzz", "jbig2dec", "lcms2", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "mupdf", "openjpeg", "pango", "poppler_utils", "qpdf", "tcl", "tesseract", "tk", "zlib", "poppler"]
 
 [workflows]
-runButton = "Project"
+runButton = "Start PDF Server"
 
 [[workflows.workflow]]
 name = "Project"
@@ -29,6 +29,15 @@ waitForPort = 5000
 
 [workflows.workflow.metadata]
 outputType = "webview"
+
+[[workflows.workflow]]
+name = "Start PDF Server"
+author = 47435049
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py"
 
 [[ports]]
 localPort = 5000

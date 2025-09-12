@@ -230,20 +230,36 @@ class PDFToolApp {
                 if (isMenuOpen) {
                     // Show menu
                     allToolsMegaMenu.classList.remove('opacity-0', 'invisible', 'translate-y-2');
-                    allToolsToggle.querySelector('svg:last-child').style.transform = 'rotate(180deg)';
+                    allToolsMegaMenu.style.display = 'block';
+                    const arrow = allToolsToggle.querySelector('svg:last-child');
+                    if (arrow) arrow.style.transform = 'rotate(180deg)';
                 } else {
                     // Hide menu
                     allToolsMegaMenu.classList.add('opacity-0', 'invisible', 'translate-y-2');
-                    allToolsToggle.querySelector('svg:last-child').style.transform = 'rotate(0deg)';
+                    setTimeout(() => {
+                        if (allToolsMegaMenu.classList.contains('opacity-0')) {
+                            allToolsMegaMenu.style.display = 'none';
+                        }
+                    }, 300);
+                    const arrow = allToolsToggle.querySelector('svg:last-child');
+                    if (arrow) arrow.style.transform = 'rotate(0deg)';
                 }
             });
 
             // Close menu when clicking outside
             document.addEventListener('click', (e) => {
                 if (!allToolsToggle.contains(e.target) && !allToolsMegaMenu.contains(e.target)) {
-                    isMenuOpen = false;
-                    allToolsMegaMenu.classList.add('opacity-0', 'invisible', 'translate-y-2');
-                    allToolsToggle.querySelector('svg:last-child').style.transform = 'rotate(0deg)';
+                    if (isMenuOpen) {
+                        isMenuOpen = false;
+                        allToolsMegaMenu.classList.add('opacity-0', 'invisible', 'translate-y-2');
+                        setTimeout(() => {
+                            if (allToolsMegaMenu.classList.contains('opacity-0')) {
+                                allToolsMegaMenu.style.display = 'none';
+                            }
+                        }, 300);
+                        const arrow = allToolsToggle.querySelector('svg:last-child');
+                        if (arrow) arrow.style.transform = 'rotate(0deg)';
+                    }
                 }
             });
 
@@ -252,21 +268,29 @@ class PDFToolApp {
                 e.stopPropagation();
             });
 
-            // Handle mega menu item clicks
+            // Handle mega menu item clicks - fix the selector
             allToolsMegaMenu.addEventListener('click', (e) => {
-                const menuItem = e.target.closest('.mega-menu-item');
-                if (menuItem && menuItem.dataset.tool) {
+                const menuItem = e.target.closest('a[href]');
+                if (menuItem) {
                     e.preventDefault();
-                    const tool = menuItem.dataset.tool;
-                    this.playSound('click');
-                    
-                    // Close menu
-                    isMenuOpen = false;
-                    allToolsMegaMenu.classList.add('opacity-0', 'invisible', 'translate-y-2');
-                    allToolsToggle.querySelector('svg:last-child').style.transform = 'rotate(0deg)';
-                    
-                    // Navigate to tool
-                    router.navigate(`/${tool}`);
+                    const href = menuItem.getAttribute('href');
+                    if (href && href.startsWith('/')) {
+                        this.playSound('click');
+                        
+                        // Close menu
+                        isMenuOpen = false;
+                        allToolsMegaMenu.classList.add('opacity-0', 'invisible', 'translate-y-2');
+                        setTimeout(() => {
+                            if (allToolsMegaMenu.classList.contains('opacity-0')) {
+                                allToolsMegaMenu.style.display = 'none';
+                            }
+                        }, 300);
+                        const arrow = allToolsToggle.querySelector('svg:last-child');
+                        if (arrow) arrow.style.transform = 'rotate(0deg)';
+                        
+                        // Navigate to tool
+                        router.navigate(href);
+                    }
                 }
             });
         }

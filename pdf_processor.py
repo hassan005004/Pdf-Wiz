@@ -26,7 +26,7 @@ import weasyprint
 import io
 import tempfile
 import shutil
-import fitz  # PyMuPDF
+# import fitz  # PyMuPDF - commented out to avoid import error
 import subprocess
 
 class PDFProcessor:
@@ -888,7 +888,7 @@ class PDFProcessor:
                 ('BACKGROUND', (0, 2), (-1, 2), colors.lightcoral),
                 ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
                 ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
                 ('FONTSIZE', (0, 0), (-1, -1), 9),
                 ('GRID', (0, 0), (-1, -1), 1, colors.black),
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
