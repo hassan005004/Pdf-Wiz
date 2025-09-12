@@ -45,7 +45,7 @@ class Router {
             const validTools = [
                 'merge', 'split', 'compress', 'rotate', 'organize', 'extract',
                 'remove-pages', 'crop', 'word-to-pdf', 'excel-to-pdf', 
-                'powerpoint-to-pdf', 'jpg-to-pdf', 'html-to-pdf',
+                'powerpoint-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'watermark',
                 'pdf-to-word', 'pdf-to-jpg', 'unlock', 'protect', 'compare'
             ];
             
@@ -123,6 +123,9 @@ class PDFToolApp {
         this.draggedPageIndex = null;
         this.audioContext = null;
         this.soundEnabled = true;
+        this.initialUploadMode = true; // Track if we're in initial upload mode
+        this.fileIdCounter = 0; // For generating unique file IDs
+        this.allPDFDocuments = new Map(); // Store all loaded PDF documents
         this.processingMessages = [
             'Processing your files...',
             'Applying transformations...',
@@ -139,9 +142,139 @@ class PDFToolApp {
         this.initHomeButton();
         this.initFAQ();
         this.initNavigation();
+        this.initializeHeaderScrollEffects();
+        this.initializeUploadWorkflow();
         
         // Make app available globally for router
         window.pdfApp = this;
+    }
+
+    // Initialize header scroll effects for better scrolling experience
+    initializeHeaderScrollEffects() {
+        const header = document.querySelector('header');
+        if (!header) return;
+
+        let lastScrollY = window.scrollY;
+        let isScrolling = false;
+
+        const handleScroll = () => {
+            const scrollY = window.scrollY;
+            
+            // Add scrolled class when scrolled down
+            if (scrollY > 10) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+            
+            lastScrollY = scrollY;
+        };
+
+        // Throttle scroll events for better performance
+        const throttledScroll = () => {
+            if (!isScrolling) {
+                window.requestAnimationFrame(() => {
+                    handleScroll();
+                    isScrolling = false;
+                });
+                isScrolling = true;
+            }
+        };
+
+        window.addEventListener('scroll', throttledScroll, { passive: true });
+    }
+
+    // Initialize enhanced upload workflow
+    initializeUploadWorkflow() {
+        // Setup large upload button
+        const largeUploadBtn = document.querySelector('.large-upload-btn');
+        const fileInput = document.getElementById('file-input');
+        
+        if (largeUploadBtn && fileInput) {
+            largeUploadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.playSound('click');
+                fileInput.click();
+            });
+        }
+
+        // Setup "Add More Files" button
+        const addMoreFilesBtn = document.querySelector('.add-more-files');
+        if (addMoreFilesBtn && fileInput) {
+            addMoreFilesBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.playSound('click');
+                fileInput.click();
+            });
+        }
+
+        // Setup mega menu toggle
+        this.initMegaMenu();
+    }
+
+    // Initialize mega menu functionality
+    initMegaMenu() {
+        const allToolsToggle = document.getElementById('all-tools-toggle');
+        const allToolsMegaMenu = document.getElementById('all-tools-mega-menu');
+        
+        if (allToolsToggle && allToolsMegaMenu) {
+            allToolsToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.playSound('click');
+                
+                const isVisible = !allToolsMegaMenu.classList.contains('opacity-0');
+                
+                if (isVisible) {
+                    // Hide menu
+                    allToolsMegaMenu.classList.add('opacity-0', 'invisible', 'translate-y-2');
+                    allToolsToggle.querySelector('svg:last-child').style.transform = 'rotate(0deg)';
+                } else {
+                    // Show menu
+                    allToolsMegaMenu.classList.remove('opacity-0', 'invisible', 'translate-y-2');
+                    allToolsToggle.querySelector('svg:last-child').style.transform = 'rotate(180deg)';
+                }
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', () => {
+                allToolsMegaMenu.classList.add('opacity-0', 'invisible', 'translate-y-2');
+                allToolsToggle.querySelector('svg:last-child').style.transform = 'rotate(0deg)';
+            });
+        }
+    }
+
+    // Transition from initial upload screen to files display
+    showFilesDisplay() {
+        const initialScreen = document.getElementById('initial-upload-screen');
+        const filesDisplay = document.getElementById('files-display');
+        
+        if (initialScreen && filesDisplay) {
+            // Hide initial screen
+            initialScreen.classList.add('hidden');
+            
+            // Show files display with animation
+            setTimeout(() => {
+                filesDisplay.classList.add('visible');
+                this.initialUploadMode = false;
+            }, 200);
+        }
+    }
+
+    // Show initial upload screen (when no files)
+    showInitialUploadScreen() {
+        const initialScreen = document.getElementById('initial-upload-screen');
+        const filesDisplay = document.getElementById('files-display');
+        
+        if (initialScreen && filesDisplay) {
+            // Hide files display
+            filesDisplay.classList.remove('visible');
+            
+            // Show initial screen
+            setTimeout(() => {
+                initialScreen.classList.remove('hidden');
+                this.initialUploadMode = true;
+            }, 200);
+        }
     }
     
     // Home button functionality
@@ -421,6 +554,28 @@ class PDFToolApp {
                 e.target.classList.add('micro-bounce');
                 setTimeout(() => e.target.classList.remove('micro-bounce'), 300);
                 this.processFiles();
+            });
+        }
+
+        // Event delegation for file and page deletion
+        document.addEventListener('click', this.handleDelegatedClicks.bind(this));
+
+        // Wire up file management buttons
+        const addMoreBtn = document.getElementById('add-more-files');
+        const clearBtn = document.getElementById('clear-files');
+        
+        if (addMoreBtn) {
+            addMoreBtn.addEventListener('click', () => {
+                this.playSound('click');
+                const fileInput = document.getElementById('file-input');
+                if (fileInput) fileInput.click();
+            });
+        }
+        
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                this.playSound('click');
+                this.clearAllFiles();
             });
         }
 
@@ -758,25 +913,314 @@ class PDFToolApp {
 
     async handleFileSelect(e) {
         const files = Array.from(e.target.files);
-        this.selectedFiles = files;
+        
+        // Append new files to existing ones instead of replacing
+        this.addFiles(files);
+        
+        // Clear input so same file can be selected again
+        e.target.value = '';
         
         // Play upload sound and show animation
         this.playSound('upload');
         this.showUploadAnimation();
         
+        // Transition to files display if in initial upload mode
+        if (this.initialUploadMode && this.selectedFiles.length > 0) {
+            this.showFilesDisplay();
+        }
+        
         // Animate file display
         await this.displaySelectedFilesAnimated();
         
-        // Show PDF preview for the first PDF file
-        const firstPDF = files.find(file => file.type === 'application/pdf');
-        if (firstPDF && typeof pdfjsLib !== 'undefined') {
-            await this.displayPDFPreview(firstPDF);
-        }
+        // Update PDF preview for all files
+        await this.updateAllPreviews();
         
         // Show process button with animation if files are selected
-        if (files.length > 0) {
+        if (this.selectedFiles.length > 0) {
             this.showProcessButtonAnimated();
         }
+    }
+
+    // Add new files to existing collection with unique IDs
+    addFiles(files) {
+        const pdfFiles = files.filter(file => file.type === 'application/pdf');
+        
+        pdfFiles.forEach(file => {
+            // Check if file already exists (by name and size)
+            const exists = this.selectedFiles.some(existing => 
+                existing.name === file.name && existing.size === file.size
+            );
+            
+            if (!exists) {
+                // Add unique ID to each file for tracking
+                file.id = ++this.fileIdCounter;
+                file.url = URL.createObjectURL(file);
+                this.selectedFiles.push(file);
+            }
+        });
+        
+        // Update file count display
+        this.updateFileCount();
+    }
+
+    // Clear all selected files
+    clearAllFiles() {
+        // Revoke object URLs to prevent memory leaks
+        this.selectedFiles.forEach(file => {
+            if (file.url) {
+                URL.revokeObjectURL(file.url);
+            }
+        });
+        
+        this.selectedFiles = [];
+        this.allPDFDocuments.clear();
+        this.pageOrder = [];
+        this.deletedPages.clear();
+        
+        // Update UI
+        this.updateFileCount();
+        this.hideSelectedFiles();
+        this.hidePDFPreview();
+        this.hideProcessButton();
+    }
+
+    // Update file count badge
+    updateFileCount() {
+        const countBadge = document.getElementById('file-count');
+        if (countBadge) {
+            countBadge.textContent = this.selectedFiles.length;
+        }
+    }
+
+    // Update previews for all PDF files
+    async updateAllPreviews() {
+        if (this.selectedFiles.length === 0) return;
+        
+        const pdfFiles = this.selectedFiles.filter(file => file.type === 'application/pdf');
+        if (pdfFiles.length === 0) return;
+        
+        // Load all PDF documents
+        for (const file of pdfFiles) {
+            if (!this.allPDFDocuments.has(file.id)) {
+                try {
+                    const pdf = await pdfjsLib.getDocument(file.url).promise;
+                    this.allPDFDocuments.set(file.id, {
+                        document: pdf,
+                        file: file,
+                        pageCount: pdf.numPages
+                    });
+                } catch (error) {
+                    console.error('Error loading PDF:', error);
+                }
+            }
+        }
+        
+        // Show unified preview of all pages
+        await this.displayUnifiedPDFPreview();
+    }
+
+    // Display unified preview of all PDF pages
+    async displayUnifiedPDFPreview() {
+        const previewSection = document.getElementById('pdf-preview-section');
+        const pagesGrid = document.getElementById('pages-grid');
+        const pageCountBadge = document.getElementById('page-count-badge');
+        const emptyState = document.getElementById('pages-empty-state');
+        
+        if (!previewSection || !pagesGrid) return;
+        
+        if (this.allPDFDocuments.size === 0) {
+            previewSection.classList.add('hidden');
+            return;
+        }
+        
+        // Show preview section
+        previewSection.classList.remove('hidden');
+        if (emptyState) emptyState.style.display = 'none';
+        
+        // Clear existing pages
+        pagesGrid.innerHTML = '';
+        
+        let totalPages = 0;
+        const allPages = [];
+        
+        // Collect all pages from all documents
+        for (const [fileId, pdfData] of this.allPDFDocuments) {
+            totalPages += pdfData.pageCount;
+            
+            for (let pageNum = 1; pageNum <= pdfData.pageCount; pageNum++) {
+                allPages.push({
+                    fileId,
+                    fileName: pdfData.file.name,
+                    pageNum,
+                    document: pdfData.document,
+                    file: pdfData.file
+                });
+            }
+        }
+        
+        // Update page count badge
+        if (pageCountBadge) {
+            pageCountBadge.textContent = `${totalPages} pages`;
+        }
+        
+        // Render page thumbnails
+        for (let i = 0; i < allPages.length; i++) {
+            const pageData = allPages[i];
+            const pageElement = await this.createPageThumbnail(pageData, i);
+            pagesGrid.appendChild(pageElement);
+        }
+    }
+
+    // Create individual page thumbnail
+    async createPageThumbnail(pageData, index) {
+        const pageContainer = document.createElement('div');
+        pageContainer.className = 'relative group cursor-pointer transform transition-all duration-300 hover:scale-105';
+        pageContainer.dataset.fileId = pageData.fileId;
+        pageContainer.dataset.pageIndex = index;
+        
+        pageContainer.innerHTML = `
+            <div class="bg-white border-2 border-gray-200 rounded-lg p-2 hover:border-red-400 hover:shadow-lg transition-all duration-300">
+                <div class="aspect-[3/4] bg-gray-100 rounded flex items-center justify-center mb-2 relative overflow-hidden">
+                    <canvas class="page-canvas max-w-full max-h-full" width="120" height="160"></canvas>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </div>
+                <div class="text-center">
+                    <p class="text-xs font-medium text-gray-700 truncate">${pageData.fileName}</p>
+                    <p class="text-xs text-gray-500">Page ${pageData.pageNum}</p>
+                </div>
+                <button class="delete-page-btn absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-600 hover:scale-110" 
+                        data-file-id="${pageData.fileId}" 
+                        data-page-index="${index}"
+                        title="Delete page">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        `;
+        
+        // Render PDF page to canvas
+        const canvas = pageContainer.querySelector('.page-canvas');
+        try {
+            const page = await pageData.document.getPage(pageData.pageNum);
+            const viewport = page.getViewport({ scale: 0.5 });
+            
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            
+            const context = canvas.getContext('2d');
+            await page.render({ canvasContext: context, viewport: viewport }).promise;
+        } catch (error) {
+            console.error('Error rendering page:', error);
+            canvas.style.display = 'none';
+            const container = canvas.parentElement;
+            container.innerHTML = `
+                <div class="flex items-center justify-center text-gray-400">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+            `;
+        }
+        
+        return pageContainer;
+    }
+
+    // Helper methods for UI management
+    hideSelectedFiles() {
+        const selectedFiles = document.getElementById('selected-files');
+        if (selectedFiles) {
+            selectedFiles.classList.add('hidden');
+        }
+    }
+
+    hidePDFPreview() {
+        const previewSection = document.getElementById('pdf-preview-section');
+        if (previewSection) {
+            previewSection.classList.add('hidden');
+        }
+        
+        const placeholder = document.getElementById('pdf-preview-placeholder');
+        if (placeholder) {
+            placeholder.classList.remove('hidden');
+        }
+    }
+
+    hideProcessButton() {
+        const processBtn = document.getElementById('process-btn');
+        if (processBtn) {
+            processBtn.style.transform = 'translateY(20px) scale(0.9)';
+            processBtn.style.opacity = '0';
+            setTimeout(() => processBtn.classList.add('hidden'), 200);
+        }
+    }
+
+    // Handle delegated clicks for dynamic elements
+    handleDelegatedClicks(e) {
+        // Handle file deletion
+        if (e.target.closest('.delete-file-btn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const btn = e.target.closest('.delete-file-btn');
+            const fileId = parseInt(btn.dataset.fileId);
+            const fileIndex = parseInt(btn.dataset.fileIndex);
+            
+            this.removeFileById(fileId);
+        }
+        
+        // Handle page deletion
+        if (e.target.closest('.delete-page-btn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const btn = e.target.closest('.delete-page-btn');
+            const fileId = parseInt(btn.dataset.fileId);
+            const pageIndex = parseInt(btn.dataset.pageIndex);
+            
+            this.removePageFromFile(fileId, pageIndex);
+        }
+    }
+
+    // Remove file by ID instead of index
+    removeFileById(fileId) {
+        this.playSound('click');
+        
+        const fileIndex = this.selectedFiles.findIndex(f => f.id === fileId);
+        if (fileIndex === -1) return;
+        
+        const file = this.selectedFiles[fileIndex];
+        
+        // Revoke object URL to prevent memory leak
+        if (file.url) {
+            URL.revokeObjectURL(file.url);
+        }
+        
+        // Remove from arrays
+        this.selectedFiles.splice(fileIndex, 1);
+        this.allPDFDocuments.delete(fileId);
+        
+        // Update displays
+        this.displaySelectedFilesAnimated();
+        this.updateAllPreviews();
+        
+        // Hide UI if no files remain
+        if (this.selectedFiles.length === 0) {
+            this.hideProcessButton();
+            this.hidePDFPreview();
+            this.hideSelectedFiles();
+            // Switch back to initial upload screen
+            this.showInitialUploadScreen();
+        }
+    }
+
+    // Remove specific page from a file (for future per-page editing)
+    removePageFromFile(fileId, pageIndex) {
+        this.playSound('click');
+        
+        // This would be implemented for per-page deletion functionality
+        // For now, we'll just remove the entire file for simplicity
+        this.removeFileById(fileId);
     }
 
     showProcessButtonAnimated() {
@@ -833,24 +1277,29 @@ class PDFToolApp {
         
         const uploadArea = document.getElementById('upload-area');
         if (uploadArea) {
-            uploadArea.classList.remove('border-blue-500', 'bg-blue-50');
+            uploadArea.classList.remove('dragging');
         }
         
         const files = Array.from(e.dataTransfer.files);
-        this.selectedFiles = files;
+        
+        // Append new files to existing ones instead of replacing
+        this.addFiles(files);
         
         // Enhanced drop animation
         this.playSound('upload');
         this.showDropAnimation(uploadArea);
         
-        await this.displaySelectedFilesAnimated();
-        
-        const firstPDF = files.find(file => file.type === 'application/pdf');
-        if (firstPDF && typeof pdfjsLib !== 'undefined') {
-            await this.displayPDFPreview(firstPDF);
+        // Transition to files display if in initial upload mode
+        if (this.initialUploadMode && this.selectedFiles.length > 0) {
+            this.showFilesDisplay();
         }
         
-        if (files.length > 0) {
+        await this.displaySelectedFilesAnimated();
+        
+        // Update PDF preview for all files
+        await this.updateAllPreviews();
+        
+        if (this.selectedFiles.length > 0) {
             this.showProcessButtonAnimated();
         }
     }
@@ -873,8 +1322,7 @@ class PDFToolApp {
         
         const uploadArea = document.getElementById('upload-area');
         if (uploadArea) {
-            uploadArea.classList.add('border-blue-500', 'bg-blue-50');
-            uploadArea.style.transform = 'scale(1.02)';
+            uploadArea.classList.add('dragging');
         }
     }
 
@@ -884,8 +1332,7 @@ class PDFToolApp {
         
         const uploadArea = document.getElementById('upload-area');
         if (uploadArea) {
-            uploadArea.classList.remove('border-blue-500', 'bg-blue-50');
-            uploadArea.style.transform = '';
+            uploadArea.classList.remove('dragging');
         }
     }
 
@@ -1380,9 +1827,9 @@ class PDFToolApp {
 
     async displaySelectedFilesAnimated() {
         const selectedFilesDiv = document.getElementById('selected-files');
-        const fileListDiv = document.getElementById('file-list');
+        const fileGridDiv = document.getElementById('file-grid');
         
-        if (!selectedFilesDiv || !fileListDiv) return;
+        if (!selectedFilesDiv || !fileGridDiv) return;
         
         if (this.selectedFiles.length === 0) {
             selectedFilesDiv.classList.add('hidden');
@@ -1390,44 +1837,53 @@ class PDFToolApp {
         }
         
         selectedFilesDiv.classList.remove('hidden');
-        fileListDiv.innerHTML = '';
+        fileGridDiv.innerHTML = '';
         
-        // Animate files appearing one by one
+        // Update file count
+        this.updateFileCount();
+        
+        // Animate files appearing one by one in grid format
         for (let [index, file] of this.selectedFiles.entries()) {
             await new Promise(resolve => {
                 setTimeout(() => {
-                    const fileDiv = document.createElement('div');
-                    fileDiv.className = 'bg-white border border-gray-200 rounded-lg p-4 flex items-center justify-between file-item-enter file-uploading';
+                    const fileCard = document.createElement('div');
+                    fileCard.className = 'relative group cursor-move bg-white border-2 border-gray-200 rounded-lg p-3 hover:border-red-400 hover:shadow-lg transition-all duration-300 transform hover:scale-105 file-item-enter file-uploading';
+                    fileCard.draggable = true;
+                    fileCard.dataset.fileId = file.id;
+                    fileCard.dataset.fileIndex = index;
                     
                     const fileSize = this.formatFileSize(file.size);
                     const fileIcon = this.getFileIcon(file.type);
                     
-                    fileDiv.innerHTML = `
-                        <div class="flex items-center">
-                            <div class="w-10 h-10 mr-3 flex items-center justify-center rounded-lg ${this.getFileIconBg(file.type)}">
+                    fileCard.innerHTML = `
+                        <div class="text-center">
+                            <div class="w-12 h-12 mx-auto mb-2 flex items-center justify-center rounded-lg ${this.getFileIconBg(file.type)}">
                                 ${fileIcon}
                             </div>
                             <div>
-                                <p class="text-sm font-medium text-gray-900">${file.name}</p>
-                                <p class="text-xs text-gray-500">${fileSize}</p>
+                                <p class="text-xs font-medium text-gray-900 truncate" title="${file.name}">${file.name}</p>
+                                <p class="text-xs text-gray-500 mt-1">${fileSize}</p>
                             </div>
                         </div>
-                        <button class="text-red-500 hover:text-red-700 transition-all hover:scale-110 p-1 rounded-full hover:bg-red-50" onclick="app.removeFile(${index})">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        <button class="delete-file-btn absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-600 hover:scale-110" 
+                                data-file-id="${file.id}" 
+                                data-file-index="${index}"
+                                title="Remove file">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                         </button>
                     `;
                     
-                    fileListDiv.appendChild(fileDiv);
+                    fileGridDiv.appendChild(fileCard);
                     
                     // Remove upload animation after it completes
                     setTimeout(() => {
-                        fileDiv.classList.remove('file-uploading');
+                        fileCard.classList.remove('file-uploading');
                     }, 1500);
                     
                     resolve();
-                }, index * 150); // Stagger animation
+                }, index * 100); // Stagger animation
             });
         }
     }

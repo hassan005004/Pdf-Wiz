@@ -48,7 +48,7 @@ async def serve_tool_page(tool_name: str):
     valid_tools = [
         'merge', 'split', 'compress', 'rotate', 'organize', 'extract',
         'remove-pages', 'crop', 'word-to-pdf', 'excel-to-pdf', 
-        'powerpoint-to-pdf', 'jpg-to-pdf', 'html-to-pdf',
+        'powerpoint-to-pdf', 'jpg-to-pdf', 'html-to-pdf', 'watermark',
         'pdf-to-word', 'pdf-to-jpg', 'unlock', 'protect', 'compare'
     ]
     
@@ -64,11 +64,35 @@ async def create_zip_download(file_paths: List[str]):
         zip_id = str(uuid.uuid4())
         zip_path = f"outputs/download_{zip_id}.zip"
         
+        # Security: Strict validation to ensure files are within outputs directory
+        outputs_dir = os.path.realpath("outputs")
+        validated_files = []
+        
+        for file_path in file_paths:
+            # Resolve real absolute path (handles symlinks and relative paths)
+            real_path = os.path.realpath(file_path)
+            
+            # Check if path is within outputs directory using commonpath
+            try:
+                common = os.path.commonpath([outputs_dir, real_path])
+                is_within_outputs = common == outputs_dir
+            except ValueError:
+                # Different drives on Windows or other path issues
+                is_within_outputs = False
+            
+            # Validate: within outputs, exists, and is a regular file
+            if is_within_outputs and os.path.isfile(real_path):
+                validated_files.append(real_path)
+            else:
+                raise HTTPException(status_code=400, detail=f"Invalid or inaccessible file path: {file_path}")
+        
+        if not validated_files:
+            raise HTTPException(status_code=400, detail="No valid files provided")
+        
         with zipfile.ZipFile(zip_path, 'w') as zip_file:
-            for file_path in file_paths:
-                if os.path.exists(file_path):
-                    # Add file to zip with just the filename (not full path)
-                    zip_file.write(file_path, os.path.basename(file_path))
+            for file_path in validated_files:
+                # Add file to zip with just the filename (not full path)
+                zip_file.write(file_path, os.path.basename(file_path))
         
         return {"zip_file": zip_path, "message": "ZIP file created successfully"}
     
@@ -874,27 +898,6 @@ async def compare_pdfs(file1: UploadFile = File(...), file2: UploadFile = File(.
             os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/create-zip")
-async def create_zip(files: List[str] = Form(...)):
-    """Create a ZIP file from multiple output files"""
-    try:
-        # Create unique ZIP filename
-        zip_filename = f"outputs/download_{uuid.uuid4().hex}.zip"
-        
-        with zipfile.ZipFile(zip_filename, 'w') as zip_file:
-            for file_path in files:
-                if os.path.exists(file_path):
-                    # Add file to ZIP with just the filename (not full path)
-                    arcname = os.path.basename(file_path)
-                    zip_file.write(file_path, arcname)
-        
-        return {"zip_file": zip_filename, "message": "ZIP file created successfully"}
-    
-    except Exception as e:
-        # Cleanup temp file in case of error
-        if 'temp_path' in locals() and os.path.exists(temp_path):
-            os.remove(temp_path)
-        raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/api/cleanup")
 async def manual_cleanup():

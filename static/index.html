@@ -9,25 +9,334 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body class="bg-gray-50 min-h-screen">
-    <!-- Header -->
-    <header>
-        <div class="container">
-            <!-- Top header with title and mega menu toggle -->
-            <div class="flex items-center justify-between py-4">
-                <div>
-                    <h1 class="text-3xl font-bold">PDF Tools</h1>
-                    <p class="mt-1">Professional PDF processing and manipulation</p>
+    <!-- Clean White Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- PDF Tools Section (Left) -->
+                <div class="flex items-center">
+                    <div class="flex items-center mr-8">
+                        <svg class="w-8 h-8 text-red-600 mr-3" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                        </svg>
+                        <h1 class="text-xl font-bold text-gray-900">PDF Tools</h1>
+                    </div>
+                    
+                    <!-- Quick Tool Access -->
+                    <nav class="hidden lg:flex items-center space-x-6">
+                        <a href="/merge" class="header-tool-btn">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6"/>
+                            </svg>
+                            <span>Merge</span>
+                        </a>
+                        <a href="/split" class="header-tool-btn">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h8"/>
+                            </svg>
+                            <span>Split</span>
+                        </a>
+                        <a href="/compress" class="header-tool-btn">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                            </svg>
+                            <span>Compress</span>
+                        </a>
+                        <a href="/rotate" class="header-tool-btn">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                            <span>Rotate</span>
+                        </a>
+                    </nav>
                 </div>
                 
-                <!-- Mobile menu button -->
-                <button id="mobile-menu-toggle" class="md:hidden bg-red-600 text-white p-2 rounded-lg hover:bg-red-700 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                <!-- All Tools Mega Menu -->
+                <div class="flex items-center">
+                    <!-- All Tools Dropdown -->
+                    <div class="relative">
+                        <button id="all-tools-toggle" class="header-tool-btn flex items-center space-x-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7H5m14 14H5"/>
+                            </svg>
+                            <span>All Tools</span>
+                            <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        
+                        <!-- Mega Menu Dropdown -->
+                        <div id="all-tools-mega-menu" class="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-lg border border-gray-200 opacity-0 invisible transform translate-y-2 transition-all duration-300 ease-out z-50">
+                            <div class="p-6">
+                                <div class="grid grid-cols-2 gap-6">
+                                    <!-- Create & Convert Category -->
+                                    <div>
+                                        <h3 class="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">Create & Convert</h3>
+                                        <div class="space-y-2">
+                                            <a href="/merge" class="mega-menu-item">
+                                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                </svg>
+                                                <div>
+                                                    <div class="font-medium text-gray-900">Merge PDF</div>
+                                                    <div class="text-xs text-gray-500">Combine multiple PDFs</div>
+                                                </div>
+                                            </a>
+                                            <a href="/word-to-pdf" class="mega-menu-item">
+                                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                </svg>
+                                                <div>
+                                                    <div class="font-medium text-gray-900">Word to PDF</div>
+                                                    <div class="text-xs text-gray-500">Convert Word documents</div>
+                                                </div>
+                                            </a>
+                                            <a href="/excel-to-pdf" class="mega-menu-item">
+                                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                </svg>
+                                                <div>
+                                                    <div class="font-medium text-gray-900">Excel to PDF</div>
+                                                    <div class="text-xs text-gray-500">Convert spreadsheets</div>
+                                                </div>
+                                            </a>
+                                            <a href="/jpg-to-pdf" class="mega-menu-item">
+                                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14"/>
+                                                </svg>
+                                                <div>
+                                                    <div class="font-medium text-gray-900">JPG to PDF</div>
+                                                    <div class="text-xs text-gray-500">Convert images</div>
+                                                </div>
+                                            </a>
+                                            <a href="/html-to-pdf" class="mega-menu-item">
+                                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                                                </svg>
+                                                <div>
+                                                    <div class="font-medium text-gray-900">HTML to PDF</div>
+                                                    <div class="text-xs text-gray-500">Convert web content</div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Edit & Organize Category -->
+                                    <div>
+                                        <h3 class="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">Edit & Organize</h3>
+                                        <div class="space-y-2">
+                                            <a href="/split" class="mega-menu-item">
+                                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                </svg>
+                                                <div>
+                                                    <div class="font-medium text-gray-900">Split PDF</div>
+                                                    <div class="text-xs text-gray-500">Extract specific pages</div>
+                                                </div>
+                                            </a>
+                                            <a href="/rotate" class="mega-menu-item">
+                                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                                </svg>
+                                                <div>
+                                                    <div class="font-medium text-gray-900">Rotate PDF</div>
+                                                    <div class="text-xs text-gray-500">Rotate pages</div>
+                                                </div>
+                                            </a>
+                                            <a href="/organize" class="mega-menu-item">
+                                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                                                </svg>
+                                                <div>
+                                                    <div class="font-medium text-gray-900">Organize PDF</div>
+                                                    <div class="text-xs text-gray-500">Reorder pages</div>
+                                                </div>
+                                            </a>
+                                            <a href="/compress" class="mega-menu-item">
+                                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                                                </svg>
+                                                <div>
+                                                    <div class="font-medium text-gray-900">Compress PDF</div>
+                                                    <div class="text-xs text-gray-500">Reduce file size</div>
+                                                </div>
+                                            </a>
+                                            <a href="/watermark" class="mega-menu-item">
+                                                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 4v10a2 2 0 002 2h6a2 2 0 002-2V8M9 8h6"/>
+                                                </svg>
+                                                <div>
+                                                    <div class="font-medium text-gray-900">Add Watermark</div>
+                                                    <div class="text-xs text-gray-500">Brand your PDFs</div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mobile menu button -->
+                    <button id="mobile-menu-toggle" class="lg:hidden ml-4 text-gray-600 hover:text-red-600 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden lg:hidden bg-white border-b border-gray-200 shadow-sm">
+        <div class="px-4 py-3 space-y-3">
+            <a href="/merge" class="tool-nav-btn-mobile">Merge PDF</a>
+            <a href="/split" class="tool-nav-btn-mobile">Split PDF</a>
+            <a href="/compress" class="tool-nav-btn-mobile">Compress PDF</a>
+            <a href="/rotate" class="tool-nav-btn-mobile">Rotate PDF</a>
+            <hr class="border-gray-200 my-3">
+            <div class="text-sm font-semibold text-gray-700 mb-2">All Tools</div>
+            <a href="/word-to-pdf" class="tool-nav-btn-mobile">Word to PDF</a>
+            <a href="/excel-to-pdf" class="tool-nav-btn-mobile">Excel to PDF</a>
+            <a href="/jpg-to-pdf" class="tool-nav-btn-mobile">JPG to PDF</a>
+            <a href="/organize" class="tool-nav-btn-mobile">Organize PDF</a>
+            <a href="/watermark" class="tool-nav-btn-mobile">Add Watermark</a>
+            <a href="/html-to-pdf" class="tool-nav-btn-mobile">HTML to PDF</a>
+        </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Tool Interface -->
+        <div id="tool-interface" class="hidden">
+            <!-- Tool Header -->
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-bold text-gray-900 mb-2" id="tool-title">PDF Tool</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto" id="tool-description">Upload your PDF files to get started</p>
+            </div>
+
+            <!-- Workspace Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- Large Drag & Drop Area (Left - 3 columns) -->
+                <div class="lg:col-span-3">
+                    <!-- Initial Upload Screen -->
+                    <div id="initial-upload-screen" class="initial-upload-screen">
+                        <div id="upload-area" class="cursor-pointer">
+                            <input type="file" id="file-input" class="hidden" multiple accept=".pdf">
+                            <div class="upload-content">
+                                <svg class="mx-auto h-20 w-20 text-red-400 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                </svg>
+                                <h3 class="text-2xl font-bold text-gray-900 mb-4">Drop your PDF files here</h3>
+                                <p class="text-lg text-gray-600 mb-6">or use the button below to select files</p>
+                                
+                                <button class="large-upload-btn">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                    </svg>
+                                    Select PDF Files
+                                </button>
+                                
+                                <p class="text-sm text-gray-500 mt-4">Supports multiple file upload • Max 10MB per file</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Files Display Area (Hidden Initially) -->
+                    <div id="files-display" class="files-display">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-2xl font-bold text-gray-900">Uploaded Files</h3>
+                            <button class="add-more-files">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                </svg>
+                                Add More Files
+                            </button>
+                        </div>
+                        
+                        <!-- File Grid -->
+                        <div id="file-grid" class="file-grid">
+                            <!-- File cards will be inserted here -->
+                        </div>
+                        
+                        <!-- File Management Info -->
+                        <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div class="flex items-start">
+                                <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <div>
+                                    <p class="text-sm font-medium text-blue-800">File Management</p>
+                                    <p class="text-xs text-blue-600 mt-1">Click × to remove files • Use action buttons for processing</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Panel (Right - 1 column) -->
+                <div class="lg:col-span-1">
+                    <!-- Floating Action Buttons -->
+                    <div class="sticky top-24 space-y-4">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                            <h4 class="font-semibold text-gray-900 mb-4">File Actions</h4>
+                            <div class="space-y-3">
+                                <button id="add-more-files" class="w-full flex items-center justify-center px-4 py-3 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-red-300 transition-all duration-200 group">
+                                    <svg class="w-4 h-4 mr-2 group-hover:text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                    </svg>
+                                    Add More Files
+                                </button>
+                                <button id="clear-files" class="w-full flex items-center justify-center px-4 py-3 bg-white border border-red-300 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 hover:border-red-400 transition-all duration-200">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                    Clear All
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Preview Panel -->
+                        <div id="pdf-preview-section" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hidden">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="font-semibold text-gray-900">Preview</h4>
+                                <span id="page-count-badge" class="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full font-medium">0 pages</span>
+                            </div>
+                            
+                            <!-- Page thumbnails will be shown here -->
+                            <div id="pages-grid" class="grid grid-cols-2 gap-2">
+                                <!-- Page thumbnails -->
+                            </div>
+                            
+                            <div id="pages-empty-state" class="text-center py-8">
+                                <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <p class="text-gray-500 text-sm">Upload PDFs to see preview</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prominent Action Button (Bottom) -->
+            <div class="mt-12 flex justify-center">
+                <button id="process-btn" class="hidden bg-red-600 hover:bg-red-700 text-white font-semibold py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                     </svg>
+                    <span id="process-btn-text">Process Files</span>
                 </button>
             </div>
-            
-            <!-- Mega Menu Navigation -->
+        </div>
+
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="text-center">
+            <!-- Hero Section -->
             <nav class="hidden md:block border-t border-gray-100 pt-4 pb-2">
                 <div class="flex items-center space-x-8">
                     <!-- Home Button -->
