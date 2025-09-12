@@ -1,12 +1,114 @@
 /**
  * Enhanced PDF Manipulation Tool Frontend with Interactive Page Management,
- * Sophisticated Animations, and Sound Effects
+ * Sophisticated Animations, and Sound Effects with URL Routing
  */
 
 // Configure PDF.js worker
 if (typeof pdfjsLib !== 'undefined') {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
+
+// URL Routing System
+class Router {
+    constructor() {
+        this.routes = {};
+        this.currentRoute = '';
+        this.init();
+    }
+
+    init() {
+        window.addEventListener('popstate', () => {
+            this.handleRoute();
+        });
+        this.handleRoute();
+    }
+
+    addRoute(path, handler) {
+        this.routes[path] = handler;
+    }
+
+    navigate(path) {
+        history.pushState({}, '', path);
+        this.handleRoute();
+    }
+
+    handleRoute() {
+        const path = window.location.pathname;
+        const toolName = path.substring(1); // Remove leading slash
+        
+        if (toolName === '' || toolName === 'home') {
+            this.showHomePage();
+        } else if (this.routes[toolName]) {
+            this.routes[toolName]();
+        } else {
+            // Check if it's a valid tool
+            const validTools = [
+                'merge', 'split', 'compress', 'rotate', 'organize', 'extract',
+                'remove-pages', 'crop', 'word-to-pdf', 'excel-to-pdf', 
+                'powerpoint-to-pdf', 'jpg-to-pdf', 'html-to-pdf',
+                'pdf-to-word', 'pdf-to-jpg', 'unlock', 'protect', 'compare'
+            ];
+            
+            if (validTools.includes(toolName)) {
+                this.showTool(toolName);
+            } else {
+                this.show404();
+            }
+        }
+    }
+
+    showHomePage() {
+        const app = window.pdfApp;
+        if (app) {
+            app.showWelcomeScreen();
+        }
+        document.getElementById('faq-section').style.display = 'none';
+        this.currentRoute = '';
+        document.title = 'PDF Tools - Professional PDF Processing';
+    }
+
+    showTool(toolName) {
+        const app = window.pdfApp;
+        if (app) {
+            app.selectTool(toolName);
+        }
+        
+        document.getElementById('faq-section').style.display = 'block';
+        this.currentRoute = toolName;
+        
+        // Update page title
+        const toolTitles = {
+            'merge': 'Merge PDF Files',
+            'split': 'Split PDF Files',
+            'compress': 'Compress PDF Files',
+            'rotate': 'Rotate PDF Pages',
+            'organize': 'Organize PDF Pages',
+            'extract': 'Extract PDF Pages',
+            'remove-pages': 'Remove PDF Pages',
+            'crop': 'Crop PDF Pages',
+            'word-to-pdf': 'Convert Word to PDF',
+            'excel-to-pdf': 'Convert Excel to PDF',
+            'powerpoint-to-pdf': 'Convert PowerPoint to PDF',
+            'jpg-to-pdf': 'Convert JPG to PDF',
+            'html-to-pdf': 'Convert HTML to PDF',
+            'pdf-to-word': 'Convert PDF to Word',
+            'pdf-to-jpg': 'Convert PDF to JPG',
+            'unlock': 'Unlock PDF Files',
+            'protect': 'Protect PDF Files',
+            'compare': 'Compare PDF Files'
+        };
+        
+        document.title = `${toolTitles[toolName] || 'PDF Tool'} - PDF Tools`;
+    }
+
+    show404() {
+        // Redirect to home for unknown routes
+        this.navigate('/');
+    }
+}
+
+// Initialize router
+const router = new Router();
 
 class PDFToolApp {
     constructor() {
@@ -35,6 +137,11 @@ class PDFToolApp {
     init() {
         this.bindEvents();
         this.initHomeButton();
+        this.initFAQ();
+        this.initNavigation();
+        
+        // Make app available globally for router
+        window.pdfApp = this;
     }
     
     // Home button functionality
@@ -42,9 +149,53 @@ class PDFToolApp {
         const homeBtn = document.getElementById('home-btn');
         if (homeBtn) {
             homeBtn.addEventListener('click', () => {
-                this.showWelcomeScreen();
+                router.navigate('/');
             });
         }
+    }
+
+    // Initialize FAQ functionality
+    initFAQ() {
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.faq-question')) {
+                const faqItem = e.target.closest('.faq-item');
+                const answer = faqItem.querySelector('.faq-answer');
+                const toggle = faqItem.querySelector('.faq-toggle');
+                
+                if (answer.classList.contains('show')) {
+                    answer.classList.remove('show');
+                    toggle.classList.remove('rotated');
+                } else {
+                    answer.classList.add('show');
+                    toggle.classList.add('rotated');
+                }
+            }
+        });
+    }
+
+    // Initialize navigation with routing
+    initNavigation() {
+        // Update mega menu items to use routing
+        document.addEventListener('click', (e) => {
+            const menuItem = e.target.closest('[data-tool]');
+            if (menuItem) {
+                e.preventDefault();
+                const tool = menuItem.getAttribute('data-tool');
+                router.navigate(`/${tool}`);
+            }
+        });
+
+        // Update mobile menu items to use routing
+        document.addEventListener('click', (e) => {
+            const mobileItem = e.target.closest('.mobile-menu-item');
+            if (mobileItem) {
+                e.preventDefault();
+                const tool = mobileItem.getAttribute('data-tool');
+                if (tool) {
+                    router.navigate(`/${tool}`);
+                }
+            }
+        });
     }
     
     showWelcomeScreen() {

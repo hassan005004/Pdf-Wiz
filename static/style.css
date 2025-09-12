@@ -104,6 +104,97 @@ header {
     width: 100%;
 }
 
+/* Ad Spaces */
+.ad-space {
+    background: var(--surface-color);
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    margin: 20px 0;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: 14px;
+    transition: var(--transition);
+}
+
+.ad-space:hover {
+    border-color: var(--primary-color);
+    background: var(--surface-soft);
+}
+
+.ad-banner {
+    min-height: 90px;
+    max-width: 728px;
+    margin: 0 auto;
+}
+
+.ad-sidebar {
+    min-height: 250px;
+    max-width: 300px;
+    margin: 20px 0;
+}
+
+.ad-square {
+    min-height: 250px;
+    max-width: 250px;
+    margin: 0 auto;
+}
+
+/* FAQ Styles */
+.faq-section {
+    background: var(--surface-color);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.faq-item {
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.5rem 0;
+}
+
+.faq-item:last-child {
+    border-bottom: none;
+}
+
+.faq-question {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.faq-question:hover {
+    color: var(--primary-color);
+}
+
+.faq-answer {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    display: none;
+}
+
+.faq-answer.show {
+    display: block;
+    margin-top: 0.5rem;
+}
+
+.faq-toggle {
+    transition: transform 0.3s ease;
+}
+
+.faq-toggle.rotated {
+    transform: rotate(180deg);
+}
+
 header h1 {
     color: #ffffff !important;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
