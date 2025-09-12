@@ -306,6 +306,44 @@ class PDFToolApp {
                 mobileMenu.classList.toggle('hidden');
             });
         }
+
+        // Handle mega menu items in welcome screen (tool cards)
+        document.querySelectorAll('.mega-tool-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tool = card.getAttribute('data-tool');
+                if (tool) {
+                    this.playSound('click');
+                    router.navigate(`/${tool}`);
+                }
+            });
+        });
+
+        // Handle category dropdown menus in desktop navigation
+        document.querySelectorAll('.group').forEach(group => {
+            const button = group.querySelector('button');
+            const dropdown = group.querySelector('.absolute');
+            
+            if (button && dropdown) {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.playSound('click');
+                });
+                
+                // Handle dropdown menu items
+                dropdown.addEventListener('click', (e) => {
+                    const menuItem = e.target.closest('.mega-menu-item');
+                    if (menuItem) {
+                        e.preventDefault();
+                        const tool = menuItem.getAttribute('data-tool');
+                        if (tool) {
+                            this.playSound('click');
+                            router.navigate(`/${tool}`);
+                        }
+                    }
+                });
+            }
+        });
     }
 
     // Transition from initial upload screen to files display
@@ -379,7 +417,10 @@ class PDFToolApp {
             if (menuItem) {
                 e.preventDefault();
                 const tool = menuItem.getAttribute('data-tool');
-                router.navigate(`/${tool}`);
+                if (tool) {
+                    this.playSound('click');
+                    router.navigate(`/${tool}`);
+                }
             }
         });
 
@@ -390,8 +431,20 @@ class PDFToolApp {
                 e.preventDefault();
                 const tool = mobileItem.getAttribute('data-tool');
                 if (tool) {
+                    this.playSound('click');
                     router.navigate(`/${tool}`);
                 }
+            }
+        });
+
+        // Handle header navigation links
+        document.addEventListener('click', (e) => {
+            const headerLink = e.target.closest('a[href]');
+            if (headerLink && headerLink.getAttribute('href').startsWith('/')) {
+                e.preventDefault();
+                const href = headerLink.getAttribute('href');
+                this.playSound('click');
+                router.navigate(href);
             }
         });
     }

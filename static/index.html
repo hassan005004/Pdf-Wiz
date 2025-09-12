@@ -69,14 +69,14 @@
                         </button>
                         
                         <!-- Mega Menu Dropdown -->
-                        <div id="all-tools-mega-menu" class="mega-menu-dropdown absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-lg border border-gray-200 opacity-0 invisible transform translate-y-2 transition-all duration-300 ease-out z-50">
+                        <div id="all-tools-mega-menu" class="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-lg border border-gray-200 opacity-0 invisible transform translate-y-2 transition-all duration-300 ease-out z-50" style="display: none;">
                             <div class="p-6">
                                 <div class="grid grid-cols-2 gap-6">
                                     <!-- Create & Convert Category -->
                                     <div>
                                         <h3 class="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">Create & Convert</h3>
                                         <div class="space-y-2">
-                                            <a href="/merge" class="mega-menu-item">
+                                            <a href="/merge" class="mega-menu-item" data-tool="merge">
                                                 <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                                 </svg>
@@ -85,7 +85,7 @@
                                                     <div class="text-xs text-gray-500">Combine multiple PDFs</div>
                                                 </div>
                                             </a>
-                                            <a href="/word-to-pdf" class="mega-menu-item">
+                                            <a href="/word-to-pdf" class="mega-menu-item" data-tool="word-to-pdf">
                                                 <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                                 </svg>
@@ -94,7 +94,7 @@
                                                     <div class="text-xs text-gray-500">Convert Word documents</div>
                                                 </div>
                                             </a>
-                                            <a href="/excel-to-pdf" class="mega-menu-item">
+                                            <a href="/excel-to-pdf" class="mega-menu-item" data-tool="excel-to-pdf">
                                                 <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                                 </svg>
@@ -103,7 +103,7 @@
                                                     <div class="text-xs text-gray-500">Convert spreadsheets</div>
                                                 </div>
                                             </a>
-                                            <a href="/jpg-to-pdf" class="mega-menu-item">
+                                            <a href="/jpg-to-pdf" class="mega-menu-item" data-tool="jpg-to-pdf">
                                                 <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14"/>
                                                 </svg>
@@ -112,7 +112,7 @@
                                                     <div class="text-xs text-gray-500">Convert images</div>
                                                 </div>
                                             </a>
-                                            <a href="/html-to-pdf" class="mega-menu-item">
+                                            <a href="/html-to-pdf" class="mega-menu-item" data-tool="html-to-pdf">
                                                 <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
                                                 </svg>
@@ -128,7 +128,7 @@
                                     <div>
                                         <h3 class="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wide">Edit & Organize</h3>
                                         <div class="space-y-2">
-                                            <a href="/split" class="mega-menu-item">
+                                            <a href="/split" class="mega-menu-item" data-tool="split">
                                                 <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                                 </svg>
@@ -137,7 +137,7 @@
                                                     <div class="text-xs text-gray-500">Extract specific pages</div>
                                                 </div>
                                             </a>
-                                            <a href="/rotate" class="mega-menu-item">
+                                            <a href="/rotate" class="mega-menu-item" data-tool="rotate">
                                                 <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                                 </svg>
@@ -146,7 +146,7 @@
                                                     <div class="text-xs text-gray-500">Rotate pages</div>
                                                 </div>
                                             </a>
-                                            <a href="/organize" class="mega-menu-item">
+                                            <a href="/organize" class="mega-menu-item" data-tool="organize">
                                                 <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
                                                 </svg>
@@ -155,7 +155,7 @@
                                                     <div class="text-xs text-gray-500">Reorder pages</div>
                                                 </div>
                                             </a>
-                                            <a href="/compress" class="mega-menu-item">
+                                            <a href="/compress" class="mega-menu-item" data-tool="compress">
                                                 <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
                                                 </svg>
@@ -164,7 +164,7 @@
                                                     <div class="text-xs text-gray-500">Reduce file size</div>
                                                 </div>
                                             </a>
-                                            <a href="/watermark" class="mega-menu-item">
+                                            <a href="/watermark" class="mega-menu-item" data-tool="watermark">
                                                 <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 4v10a2 2 0 002 2h6a2 2 0 002-2V8M9 8h6"/>
                                                 </svg>
