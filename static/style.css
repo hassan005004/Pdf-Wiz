@@ -1704,7 +1704,211 @@ html, body {
     overflow-x: hidden;
 }
 
-/* Enhanced responsive grid system */
+/* Mega Menu Container */
+.mega-menu-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+}
+
+/* Mega Menu Grid Layout */
+.mega-menu-grid {
+    display: grid;
+    gap: 2rem;
+    width: 100%;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+    .mega-menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .mega-menu-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1400px) {
+    .mega-menu-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Category Section */
+.category-section {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface-soft) 100%);
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    box-shadow: var(--shadow-lg);
+    border: 2px solid var(--border-light);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    min-height: 400px;
+}
+
+.category-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--success-color) 100%);
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.category-section:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 50px -12px rgba(220, 38, 38, 0.3);
+    border-color: var(--primary-color);
+}
+
+.category-section:hover::before {
+    opacity: 1;
+}
+
+/* Category Header */
+.category-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.category-icon {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    box-shadow: var(--shadow-lg);
+    transition: var(--transition);
+}
+
+.category-section:hover .category-icon {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.category-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.category-description {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* Category Tools Grid */
+.category-tools {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+    .category-tools {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mega Tool Cards */
+.mega-tool-card {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: white;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: var(--transition);
+    border: 2px solid var(--border-light);
+    position: relative;
+    overflow: hidden;
+    gap: 1rem;
+    min-height: 70px;
+}
+
+.mega-tool-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.15), transparent);
+    transition: left 0.5s ease;
+}
+
+.mega-tool-card:hover::before {
+    left: 100%;
+}
+
+.mega-tool-card:hover {
+    transform: translateX(8px) scale(1.02);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, white, var(--surface-soft));
+}
+
+.mega-tool-card:active {
+    transform: translateX(4px) scale(0.98);
+}
+
+/* Tool Icon in Mega Cards */
+.mega-tool-card .tool-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.mega-tool-card:hover .tool-icon {
+    transform: scale(1.1) rotate(3deg);
+    box-shadow: var(--shadow-md);
+}
+
+/* Tool Content in Mega Cards */
+.tool-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.tool-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+.tool-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.3;
+}
+
+/* Enhanced responsive grid system - Legacy support */
 .grid-responsive {
     display: grid;
     gap: 1rem;
@@ -1721,12 +1925,29 @@ html, body {
     .container {
         padding: 0 0.5rem;
     }
+    
+    .mega-menu-container {
+        padding: 0 0.5rem;
+    }
+    
+    .category-section {
+        padding: 1.5rem;
+        min-height: auto;
+    }
+    
+    .category-tools {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (min-width: 481px) and (max-width: 640px) {
     .grid-responsive {
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
+    }
+    
+    .mega-menu-container {
+        padding: 0 0.75rem;
     }
 }
 
@@ -1755,6 +1976,64 @@ html, body {
     .grid-responsive {
         grid-template-columns: repeat(5, 1fr);
         gap: 1.5rem;
+    }
+}
+
+/* Hover animations for better UX */
+@keyframes categoryFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-2px);
+    }
+}
+
+.category-section:hover {
+    animation: categoryFloat 2s ease-in-out infinite;
+}
+
+/* Gradient text animations */
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.category-title {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--success-color));
+    background-size: 200% 200%;
+    animation: gradientShift 4s ease infinite;
+}
+
+/* Enhanced focus states */
+.mega-tool-card:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Loading states for dynamic content */
+.mega-tool-card.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.mega-tool-card.loading .tool-icon {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
     }
 }
 
