@@ -218,27 +218,68 @@ class PDFToolApp {
         const allToolsMegaMenu = document.getElementById('all-tools-mega-menu');
         
         if (allToolsToggle && allToolsMegaMenu) {
+            let isMenuOpen = false;
+            
             allToolsToggle.addEventListener('click', (e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 this.playSound('click');
                 
-                const isVisible = !allToolsMegaMenu.classList.contains('opacity-0');
+                isMenuOpen = !isMenuOpen;
                 
-                if (isVisible) {
-                    // Hide menu
-                    allToolsMegaMenu.classList.add('opacity-0', 'invisible', 'translate-y-2');
-                    allToolsToggle.querySelector('svg:last-child').style.transform = 'rotate(0deg)';
-                } else {
+                if (isMenuOpen) {
                     // Show menu
                     allToolsMegaMenu.classList.remove('opacity-0', 'invisible', 'translate-y-2');
                     allToolsToggle.querySelector('svg:last-child').style.transform = 'rotate(180deg)';
+                } else {
+                    // Hide menu
+                    allToolsMegaMenu.classList.add('opacity-0', 'invisible', 'translate-y-2');
+                    allToolsToggle.querySelector('svg:last-child').style.transform = 'rotate(0deg)';
                 }
             });
 
             // Close menu when clicking outside
-            document.addEventListener('click', () => {
-                allToolsMegaMenu.classList.add('opacity-0', 'invisible', 'translate-y-2');
-                allToolsToggle.querySelector('svg:last-child').style.transform = 'rotate(0deg)';
+            document.addEventListener('click', (e) => {
+                if (!allToolsToggle.contains(e.target) && !allToolsMegaMenu.contains(e.target)) {
+                    isMenuOpen = false;
+                    allToolsMegaMenu.classList.add('opacity-0', 'invisible', 'translate-y-2');
+                    allToolsToggle.querySelector('svg:last-child').style.transform = 'rotate(0deg)';
+                }
+            });
+
+            // Prevent menu from closing when clicking inside it
+            allToolsMegaMenu.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+
+            // Handle mega menu item clicks
+            allToolsMegaMenu.addEventListener('click', (e) => {
+                const menuItem = e.target.closest('.mega-menu-item');
+                if (menuItem && menuItem.dataset.tool) {
+                    e.preventDefault();
+                    const tool = menuItem.dataset.tool;
+                    this.playSound('click');
+                    
+                    // Close menu
+                    isMenuOpen = false;
+                    allToolsMegaMenu.classList.add('opacity-0', 'invisible', 'translate-y-2');
+                    allToolsToggle.querySelector('svg:last-child').style.transform = 'rotate(0deg)';
+                    
+                    // Navigate to tool
+                    router.navigate(`/${tool}`);
+                }
+            });
+        }
+
+        // Handle mobile menu toggle
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuToggle && mobileMenu) {
+            mobileMenuToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.playSound('click');
+                mobileMenu.classList.toggle('hidden');
             });
         }
     }
