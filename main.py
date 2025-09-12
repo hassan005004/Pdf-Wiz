@@ -11,7 +11,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, File, UploadFile, HTTPException, Form, BackgroundTasks
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from pdf_processor import PDFProcessor
@@ -41,17 +41,53 @@ async def read_root():
     """Serve the main HTML page"""
     return FileResponse("static/index.html")
 
+@app.get("/{tool_name}")
+async def serve_tool_page(tool_name: str):
+    """Serve the main HTML page for any tool route"""
+    # Valid tool names
+    valid_tools = [
+        'merge', 'split', 'compress', 'rotate', 'organize', 'extract',
+        'remove-pages', 'crop', 'word-to-pdf', 'excel-to-pdf', 
+        'powerpoint-to-pdf', 'jpg-to-pdf', 'html-to-pdf',
+        'pdf-to-word', 'pdf-to-jpg', 'unlock', 'protect', 'compare'
+    ]
+    
+    if tool_name in valid_tools:
+        return FileResponse("static/index.html")
+    else:
+        raise HTTPException(status_code=404, detail="Tool not found")
+
+@app.post("/api/create-zip")
+async def create_zip_download(file_paths: List[str]):
+    """Create a ZIP file containing multiple processed files"""
+    try:
+        zip_id = str(uuid.uuid4())
+        zip_path = f"outputs/download_{zip_id}.zip"
+        
+        with zipfile.ZipFile(zip_path, 'w') as zip_file:
+            for file_path in file_paths:
+                if os.path.exists(file_path):
+                    # Add file to zip with just the filename (not full path)
+                    zip_file.write(file_path, os.path.basename(file_path))
+        
+        return {"zip_file": zip_path, "message": "ZIP file created successfully"}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/merge")
 async def merge_pdfs(files: List[UploadFile] = File(...)):
     """Merge multiple PDF files into one"""
     try:
-        if len(files) < 2:
-            raise HTTPException(status_code=400, detail="At least 2 PDF files required for merging")
+        if len(files) < 1:
+            raise HTTPException(status_code=400, detail="At least 1 PDF file required for merging")
         
         # Save uploaded files
         temp_files = []
         for file in files:
-            if not file.filename or not file.filename.lower().endswith('.pdf'):
+            if not file.filename:
+                raise HTTPException(status_code=400, detail="Filename is missing")
+            if not file.filename.lower().endswith('.pdf'):
                 raise HTTPException(status_code=400, detail=f"File {file.filename} is not a PDF")
             
             safe_filename = os.path.basename(file.filename)
@@ -71,13 +107,20 @@ async def merge_pdfs(files: List[UploadFile] = File(...)):
         return {"output_file": output_path, "message": "PDFs merged successfully"}
     
     except Exception as e:
+        # Clean up temp files in case of error
+        if 'temp_files' in locals():
+            for temp_file in temp_files:
+                if os.path.exists(temp_file):
+                    os.remove(temp_file)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/split")
 async def split_pdf(file: UploadFile = File(...), pages: str = Form(...)):
     """Split PDF into separate pages or page ranges"""
     try:
-        if not file.filename or not file.filename.lower().endswith('.pdf'):
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="Filename is missing")
+        if not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -107,13 +150,18 @@ async def split_pdf(file: UploadFile = File(...), pages: str = Form(...)):
         return {"output_files": output_files, "message": "PDF split successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/extract")
 async def extract_pages(file: UploadFile = File(...), pages: str = Form(...)):
     """Extract specific pages from PDF"""
     try:
-        if not file.filename or not file.filename.lower().endswith('.pdf'):
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="Filename is missing")
+        if not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -137,6 +185,9 @@ async def extract_pages(file: UploadFile = File(...), pages: str = Form(...)):
         return {"output_file": output_path, "message": "Pages extracted successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/rotate")
@@ -165,13 +216,18 @@ async def rotate_pdf(file: UploadFile = File(...), angle: int = Form(...)):
         return {"output_file": output_path, "message": f"PDF rotated {angle} degrees successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/compress")
 async def compress_pdf(file: UploadFile = File(...)):
     """Compress PDF file"""
     try:
-        if not file.filename or not file.filename.lower().endswith('.pdf'):
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="Filename is missing")
+        if not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -190,6 +246,9 @@ async def compress_pdf(file: UploadFile = File(...)):
         return {"output_file": output_path, "message": "PDF compressed successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/protect")
@@ -218,13 +277,18 @@ async def protect_pdf(file: UploadFile = File(...), password: str = Form(...)):
         return {"output_file": output_path, "message": "PDF protected with password successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/unlock")
 async def unlock_pdf(file: UploadFile = File(...), password: str = Form(...)):
     """Remove password protection from PDF"""
     try:
-        if not file.filename or not file.filename.lower().endswith('.pdf'):
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="Filename is missing")
+        if not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -243,6 +307,9 @@ async def unlock_pdf(file: UploadFile = File(...), password: str = Form(...)):
         return {"output_file": output_path, "message": "PDF unlocked successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/jpg-to-pdf")
@@ -272,13 +339,18 @@ async def jpg_to_pdf(files: List[UploadFile] = File(...)):
         return {"output_file": output_path, "message": "Images converted to PDF successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/pdf-to-jpg")
 async def pdf_to_jpg(file: UploadFile = File(...)):
     """Convert PDF to JPG images"""
     try:
-        if not file.filename or not file.filename.lower().endswith('.pdf'):
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="Filename is missing")
+        if not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -296,6 +368,9 @@ async def pdf_to_jpg(file: UploadFile = File(...)):
         return {"output_files": output_files, "message": "PDF converted to images successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/watermark")
@@ -324,6 +399,9 @@ async def add_watermark(file: UploadFile = File(...), text: str = Form(...)):
         return {"output_file": output_path, "message": "Watermark added successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/download/{file_path:path}")
@@ -341,6 +419,9 @@ async def download_file(file_path: str):
         )
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 # ===== ADVANCED PDF OPERATIONS =====
@@ -349,7 +430,9 @@ async def download_file(file_path: str):
 async def organize_pdf(file: UploadFile = File(...), page_order: str = Form(...)):
     """Reorder pages in PDF"""
     try:
-        if not file.filename or not file.filename.lower().endswith('.pdf'):
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="Filename is missing")
+        if not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -371,13 +454,18 @@ async def organize_pdf(file: UploadFile = File(...), page_order: str = Form(...)
         return {"output_file": output_path, "message": "PDF pages reorganized successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/remove-pages")
 async def remove_pages(file: UploadFile = File(...), pages: str = Form(...)):
     """Remove specific pages from PDF"""
     try:
-        if not file.filename or not file.filename.lower().endswith('.pdf'):
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="Filename is missing")
+        if not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -399,13 +487,18 @@ async def remove_pages(file: UploadFile = File(...), pages: str = Form(...)):
         return {"output_file": output_path, "message": "Pages removed successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/optimize")
 async def optimize_pdf(file: UploadFile = File(...)):
     """Optimize PDF for smaller size"""
     try:
-        if not file.filename or not file.filename.lower().endswith('.pdf'):
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="Filename is missing")
+        if not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -424,13 +517,18 @@ async def optimize_pdf(file: UploadFile = File(...)):
         return {"output_file": output_path, "message": "PDF optimized successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/repair")
 async def repair_pdf(file: UploadFile = File(...)):
     """Repair corrupted PDF"""
     try:
-        if not file.filename or not file.filename.lower().endswith('.pdf'):
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="Filename is missing")
+        if not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -449,13 +547,18 @@ async def repair_pdf(file: UploadFile = File(...)):
         return {"output_file": output_path, "message": "PDF repaired successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/ocr")
 async def ocr_pdf(file: UploadFile = File(...), language: str = Form("eng")):
     """Perform OCR on PDF to make it searchable"""
     try:
-        if not file.filename or not file.filename.lower().endswith('.pdf'):
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="Filename is missing")
+        if not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -474,13 +577,18 @@ async def ocr_pdf(file: UploadFile = File(...), language: str = Form("eng")):
         return {"output_file": output_path, "message": "OCR processing completed successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/add-page-numbers")
 async def add_page_numbers(file: UploadFile = File(...), position: str = Form("bottom-right")):
     """Add page numbers to PDF"""
     try:
-        if not file.filename or not file.filename.lower().endswith('.pdf'):
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="Filename is missing")
+        if not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -499,13 +607,18 @@ async def add_page_numbers(file: UploadFile = File(...), position: str = Form("b
         return {"output_file": output_path, "message": "Page numbers added successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/crop")
 async def crop_pdf(file: UploadFile = File(...), left: float = Form(...), bottom: float = Form(...), right: float = Form(...), top: float = Form(...)):
     """Crop PDF pages"""
     try:
-        if not file.filename or not file.filename.lower().endswith('.pdf'):
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="Filename is missing")
+        if not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -525,6 +638,9 @@ async def crop_pdf(file: UploadFile = File(...), left: float = Form(...), bottom
         return {"output_file": output_path, "message": "PDF cropped successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 # ===== FORMAT CONVERSIONS =====
@@ -552,6 +668,9 @@ async def word_to_pdf(file: UploadFile = File(...)):
         return {"output_file": output_path, "message": "Word document converted to PDF successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/excel-to-pdf")
@@ -577,6 +696,9 @@ async def excel_to_pdf(file: UploadFile = File(...)):
         return {"output_file": output_path, "message": "Excel file converted to PDF successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/powerpoint-to-pdf")
@@ -602,6 +724,9 @@ async def powerpoint_to_pdf(file: UploadFile = File(...)):
         return {"output_file": output_path, "message": "PowerPoint converted to PDF successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/html-to-pdf")
@@ -615,13 +740,18 @@ async def html_to_pdf(html_content: str = Form(...)):
         return {"output_file": output_path, "message": "HTML converted to PDF successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/pdf-to-pdfa")
 async def pdf_to_pdfa(file: UploadFile = File(...)):
     """Convert PDF to PDF/A format"""
     try:
-        if not file.filename or not file.filename.lower().endswith('.pdf'):
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="Filename is missing")
+        if not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -640,6 +770,9 @@ async def pdf_to_pdfa(file: UploadFile = File(...)):
         return {"output_file": output_path, "message": "PDF converted to PDF/A successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 # ===== SECURITY & ADVANCED FEATURES =====
@@ -648,7 +781,9 @@ async def pdf_to_pdfa(file: UploadFile = File(...)):
 async def sign_pdf(file: UploadFile = File(...), signature: str = Form(...)):
     """Add digital signature to PDF"""
     try:
-        if not file.filename or not file.filename.lower().endswith('.pdf'):
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="Filename is missing")
+        if not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -667,13 +802,18 @@ async def sign_pdf(file: UploadFile = File(...), signature: str = Form(...)):
         return {"output_file": output_path, "message": "PDF signed successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/redact")
 async def redact_pdf(file: UploadFile = File(...), areas: str = Form(...)):
     """Redact sensitive information from PDF"""
     try:
-        if not file.filename or not file.filename.lower().endswith('.pdf'):
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="Filename is missing")
+        if not file.filename.lower().endswith('.pdf'):
             raise HTTPException(status_code=400, detail="File must be a PDF")
         
         # Save uploaded file
@@ -696,6 +836,9 @@ async def redact_pdf(file: UploadFile = File(...), areas: str = Form(...)):
         return {"output_file": output_path, "message": "PDF redacted successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/compare")
@@ -726,6 +869,9 @@ async def compare_pdfs(file1: UploadFile = File(...), file2: UploadFile = File(.
         return {"output_file": output_path, "message": "PDF comparison completed successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/create-zip")
@@ -745,6 +891,9 @@ async def create_zip(files: List[str] = Form(...)):
         return {"zip_file": zip_filename, "message": "ZIP file created successfully"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/api/cleanup")
@@ -756,6 +905,9 @@ async def manual_cleanup():
         return {"message": f"Cleaned up {deleted_count} old files"}
     
     except Exception as e:
+        # Cleanup temp file in case of error
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
