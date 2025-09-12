@@ -1,27 +1,27 @@
 
-/* Modern CSS Variables - Green & Red Color Scheme */
+/* Modern CSS Variables - Red Color Scheme for PDF Tools */
 :root {
-    --primary-color: #10b981;
-    --primary-hover: #059669;
-    --secondary-color: #34d399;
-    --accent-color: #ef4444;
+    --primary-color: #dc2626;
+    --primary-hover: #b91c1c;
+    --secondary-color: #ef4444;
+    --accent-color: #f87171;
     --accent-hover: #dc2626;
-    --success-color: #22c55e;
-    --success-hover: #16a34a;
-    --danger-color: #f87171;
-    --warning-color: #fbbf24;
-    --background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+    --success-color: #10b981;
+    --success-hover: #059669;
+    --danger-color: #b91c1c;
+    --warning-color: #f59e0b;
+    --background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
     --surface: #ffffff;
-    --surface-soft: #f7fee7;
-    --surface-accent: #fef2f2;
+    --surface-soft: #fef2f2;
+    --surface-accent: #fee2e2;
     --text-primary: #1f2937;
     --text-secondary: #6b7280;
-    --border-light: #d1fae5;
-    --border-soft: #a7f3d0;
-    --border-accent: #fecaca;
-    --shadow-sm: 0 1px 3px 0 rgba(34, 197, 94, 0.1), 0 1px 2px 0 rgba(34, 197, 94, 0.06);
-    --shadow-md: 0 4px 6px -1px rgba(34, 197, 94, 0.15), 0 2px 4px -1px rgba(34, 197, 94, 0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(34, 197, 94, 0.2), 0 4px 6px -2px rgba(34, 197, 94, 0.15);
+    --border-light: #fecaca;
+    --border-soft: #fca5a5;
+    --border-accent: #ef4444;
+    --shadow-sm: 0 1px 3px 0 rgba(220, 38, 38, 0.1), 0 1px 2px 0 rgba(220, 38, 38, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(220, 38, 38, 0.15), 0 2px 4px -1px rgba(220, 38, 38, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(220, 38, 38, 0.2), 0 4px 6px -2px rgba(220, 38, 38, 0.15);
     --shadow-accent: 0 4px 6px -1px rgba(239, 68, 68, 0.15), 0 2px 4px -1px rgba(239, 68, 68, 0.1);
     --radius-sm: 0.5rem;
     --radius-md: 0.75rem;
@@ -38,18 +38,58 @@ body {
     min-height: 100vh;
     color: var(--text-primary);
     line-height: 1.6;
+    overflow-x: hidden;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-/* Container improvements */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* Container improvements - Responsive Design */
 .container {
-    max-width: 1400px;
+    max-width: 100%;
+    width: 100%;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0 0.75rem;
+    box-sizing: border-box;
+}
+
+@media (min-width: 480px) {
+    .container {
+        padding: 0 1rem;
+    }
 }
 
 @media (min-width: 640px) {
     .container {
+        padding: 0 1.5rem;
+        max-width: 100%;
+    }
+}
+
+@media (min-width: 768px) {
+    .container {
         padding: 0 2rem;
+        max-width: 100%;
+    }
+}
+
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1200px;
+    }
+}
+
+@media (min-width: 1280px) {
+    .container {
+        max-width: 1280px;
     }
 }
 
@@ -333,7 +373,7 @@ header p {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.2), transparent);
     transition: left 0.3s;
 }
 
@@ -381,7 +421,7 @@ header p {
     left: 50%;
     width: 0;
     height: 0;
-    background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(220, 38, 38, 0.15) 0%, transparent 70%);
     transform: translate(-50%, -50%);
     transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 0;
@@ -516,7 +556,7 @@ header p {
     background: var(--surface-soft);
     border-radius: 9999px;
     overflow: hidden;
-    box-shadow: inset 0 2px 6px 0 rgba(16, 185, 129, 0.1);
+    box-shadow: inset 0 2px 6px 0 rgba(220, 38, 38, 0.1);
     border: 1px solid var(--border-light);
 }
 
@@ -722,7 +762,7 @@ header p {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(220, 38, 38, 0.2), transparent);
     transition: left 0.5s;
 }
 
@@ -1068,6 +1108,116 @@ header p {
     background: var(--primary-hover);
 }
 
+/* Prevent horizontal overflow and improve responsive design */
+html, body {
+    overflow-x: hidden !important;
+    width: 100%;
+    max-width: 100vw;
+}
+
+.max-w-7xl, .max-w-6xl, .max-w-5xl {
+    max-width: 100% !important;
+    overflow-x: hidden;
+}
+
+/* Enhanced responsive grid system */
+.grid-responsive {
+    display: grid;
+    gap: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+    .grid-responsive {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .container {
+        padding: 0 0.5rem;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 640px) {
+    .grid-responsive {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+    .grid-responsive {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .grid-responsive {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+}
+
+@media (min-width: 1025px) and (max-width: 1280px) {
+    .grid-responsive {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+    }
+}
+
+@media (min-width: 1281px) {
+    .grid-responsive {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 1.5rem;
+    }
+}
+
+/* Mobile navigation improvements */
+@media (max-width: 768px) {
+    .mobile-menu {
+        width: 100%;
+        overflow-x: hidden;
+    }
+    
+    .mega-menu {
+        display: none;
+    }
+    
+    .tool-card {
+        padding: 1rem;
+        margin: 0.5rem 0;
+    }
+    
+    .text-4xl {
+        font-size: 2rem;
+    }
+    
+    .text-3xl {
+        font-size: 1.75rem;
+    }
+}
+
+/* Tablet responsive adjustments */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .container {
+        padding: 0 1.5rem;
+    }
+    
+    .tool-card {
+        padding: 1.25rem;
+    }
+}
+
+/* Desktop responsive adjustments */
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1200px;
+        padding: 0 2rem;
+    }
+}
+
 /* Focus improvements with green theme */
 .focus-ring {
     transition: var(--transition);
@@ -1082,28 +1232,28 @@ header p {
 .glass-card {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(220, 38, 38, 0.2);
     box-shadow: var(--shadow-lg);
 }
 
 .glass-button {
-    background: rgba(16, 185, 129, 0.2);
+    background: rgba(220, 38, 38, 0.2);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    border: 1px solid rgba(220, 38, 38, 0.3);
     transition: var(--transition);
 }
 
 .glass-button:hover {
-    background: rgba(16, 185, 129, 0.3);
+    background: rgba(220, 38, 38, 0.3);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
 
-/* Ripple Effect with green theme */
+/* Ripple Effect with red theme */
 .ripple {
     position: absolute;
     border-radius: 50%;
-    background: rgba(16, 185, 129, 0.4);
+    background: rgba(220, 38, 38, 0.4);
     transform: scale(0);
     animation: ripple-animation 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: none;
