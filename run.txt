@@ -1,0 +1,12 @@
+python -m pip install fastapi openpyxl pdf2image pdfplumber pikepdf pillow pypdf2 pytesseract python-docx python-multipart python-pptx reportlab uvicorn weasyprint
+python main.py
+uvicorn main:app --reload
+
+
+copy requirements from pyproject.toml to requirements.txt file then
+python -m venv venv
+.\venv\Scripts\activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+uvicorn main:app --reload
+

@@ -228,7 +228,6 @@ header.scrolled {
 
 /* Large Upload Area */
 #upload-area {
-    min-height: 32rem;
     border: 3px dashed #d1d5db;
     border-radius: 20px;
     background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
@@ -619,6 +618,7 @@ header.scrolled {
     min-height: 90px;
     max-width: 728px;
     margin: 0 auto;
+    border: 1px solid black;
 }
 
 .ad-sidebar {
@@ -1802,10 +1802,6 @@ html, body {
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 0.5rem;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
 }
 
 .category-description {
@@ -1814,24 +1810,14 @@ html, body {
     font-weight: 500;
 }
 
-/* Category Tools Grid */
-.category-tools {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: 1fr;
-}
-
-@media (min-width: 640px) {
-    .category-tools {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
 
 /* Mega Tool Cards */
 .mega-tool-card {
     display: flex;
+    flex-direction: column;
     align-items: center;
     padding: 1rem;
+    text-align: center;
     background: white;
     border-radius: var(--radius-lg);
     cursor: pointer;
@@ -1841,6 +1827,7 @@ html, body {
     overflow: hidden;
     gap: 1rem;
     min-height: 70px;
+    width: 100%;
 }
 
 .mega-tool-card::before {
@@ -1859,14 +1846,9 @@ html, body {
 }
 
 .mega-tool-card:hover {
-    transform: translateX(8px) scale(1.02);
     box-shadow: var(--shadow-md);
     border-color: var(--primary-color);
     background: linear-gradient(135deg, white, var(--surface-soft));
-}
-
-.mega-tool-card:active {
-    transform: translateX(4px) scale(0.98);
 }
 
 /* Tool Icon in Mega Cards */
@@ -1932,10 +1914,6 @@ html, body {
     .category-section {
         padding: 1.5rem;
         min-height: auto;
-    }
-
-    .category-tools {
-        grid-template-columns: 1fr;
     }
 }
 
@@ -2003,12 +1981,6 @@ html, body {
     100% {
         background-position: 0% 50%;
     }
-}
-
-.category-title {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--success-color));
-    background-size: 200% 200%;
-    animation: gradientShift 4s ease infinite;
 }
 
 /* Enhanced focus states */
@@ -2182,4 +2154,10 @@ html, body {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 50;
     display: none;
+}
+
+header,
+header>div,
+header .relative {
+    overflow: visible;
 }
